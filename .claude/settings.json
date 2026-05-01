@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(jq:*)",
+      "Bash(./scripts/validate.sh)",
+      "Bash(./scripts/stats.sh)",
+      "Bash(./scripts/query.sh:*)",
+      "Bash(bash scripts/validate.sh)",
+      "Bash(bash scripts/stats.sh)",
+      "Bash(bash scripts/query.sh:*)"
+    ]
+  }
+}

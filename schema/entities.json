@@ -1,0 +1,460 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vibrana.ai/company-graph/schema/entities",
+  "title": "Company Graph Entity Schemas",
+  "description": "JSON Schema definitions for all six entity types in the Vibrana Company Graph v2",
+  "definitions": {
+    "Actor": {
+      "$id": "#/definitions/Actor",
+      "title": "Actor",
+      "description": "A person or team who participates in workflows, makes decisions, and owns value objects",
+      "type": "object",
+      "required": ["id", "name", "role", "job_family", "tools_used", "current_workflows", "joined_date"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^actor-[0-9]{3,}$",
+          "description": "Unique identifier for the actor, format: actor-NNN"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "description": "Full name of the person or name of the team"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 150,
+          "description": "Job title or role description"
+        },
+        "job_family": {
+          "type": "string",
+          "enum": [
+            "Executive Leadership",
+            "Engineering",
+            "Product",
+            "Customer Success",
+            "Sales",
+            "Finance",
+            "People Operations",
+            "Marketing",
+            "Legal",
+            "Design",
+            "Data",
+            "Operations",
+            "Other"
+          ],
+          "description": "Functional area or department the actor belongs to"
+        },
+        "tools_used": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 0,
+          "description": "List of tools and systems this actor regularly uses"
+        },
+        "current_workflows": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^wf-[0-9]{3,}$"
+          },
+          "description": "IDs of workflows this actor participates in"
+        },
+        "reports_to": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^actor-[0-9]{3,}$"
+            },
+            { "type": "null" }
+          ],
+          "description": "Actor ID of this person's manager, or null for top-level"
+        },
+        "joined_date": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO 8601 date when this person joined the company"
+        },
+        "location": {
+          "type": "string",
+          "description": "Office location or 'Remote (City)'"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional context about this actor's role, history, or notable attributes"
+        }
+      }
+    },
+
+    "Workflow": {
+      "$id": "#/definitions/Workflow",
+      "title": "Workflow",
+      "description": "A repeatable business process — the unit of operational work",
+      "type": "object",
+      "required": ["id", "name", "owner", "job_family", "trigger", "output", "steps", "tools_used", "avg_time_hours", "pain_points", "ai_readiness_score", "ai_candidate"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^wf-[0-9]{3,}$",
+          "description": "Unique identifier for the workflow, format: wf-NNN"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 150,
+          "description": "Human-readable workflow name"
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^actor-[0-9]{3,}$",
+          "description": "Actor ID of the person who owns and is accountable for this workflow"
+        },
+        "job_family": {
+          "type": "string",
+          "enum": [
+            "Executive Leadership",
+            "Engineering",
+            "Product",
+            "Customer Success",
+            "Sales",
+            "Finance",
+            "People Operations",
+            "Marketing",
+            "Legal",
+            "Design",
+            "Data",
+            "Operations",
+            "Other"
+          ]
+        },
+        "trigger": {
+          "type": "string",
+          "description": "What initiates this workflow — event, schedule, or condition"
+        },
+        "output": {
+          "type": "string",
+          "description": "The primary deliverable or outcome of this workflow"
+        },
+        "steps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Ordered list of steps in the workflow"
+        },
+        "tools_used": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tools and systems used in this workflow"
+        },
+        "avg_time_hours": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average time in hours to complete one instance of this workflow"
+        },
+        "pain_points": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Known friction points, inefficiencies, or failure modes"
+        },
+        "ai_readiness_score": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Score 1–10: how ready this workflow is for AI augmentation (1=not ready, 10=highly ready)"
+        },
+        "ai_candidate": {
+          "type": "boolean",
+          "description": "Whether this workflow is a near-term candidate for AI augmentation"
+        },
+        "ai_opportunity_summary": {
+          "type": "string",
+          "description": "Description of the AI opportunity, blockers, and expected ROI"
+        }
+      }
+    },
+
+    "Decision": {
+      "$id": "#/definitions/Decision",
+      "title": "Decision",
+      "description": "A significant, durable choice made by the organization — captured with full rationale and dissent",
+      "type": "object",
+      "required": ["id", "title", "made_by", "made_at", "summary", "context", "alternatives_considered", "outcome", "rationale", "dissenting_views", "still_valid", "affects_workflows"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^dec-[0-9]{3,}$",
+          "description": "Unique identifier for the decision, format: dec-NNN"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200,
+          "description": "Short, descriptive title for the decision"
+        },
+        "made_by": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^actor-[0-9]{3,}$"
+          },
+          "minItems": 1,
+          "description": "Actor IDs of the primary decision-makers"
+        },
+        "made_at": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO 8601 date the decision was made"
+        },
+        "summary": {
+          "type": "string",
+          "description": "1-3 sentence summary of the decision"
+        },
+        "context": {
+          "type": "string",
+          "description": "Background and context that prompted this decision"
+        },
+        "alternatives_considered": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "reason_rejected"],
+            "properties": {
+              "name": { "type": "string" },
+              "reason_rejected": { "type": "string" }
+            }
+          },
+          "description": "Alternatives that were considered and why they were rejected"
+        },
+        "outcome": {
+          "type": "string",
+          "description": "What actually happened as a result of this decision"
+        },
+        "rationale": {
+          "type": "string",
+          "description": "The full reasoning behind the decision"
+        },
+        "dissenting_views": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["person", "view"],
+            "properties": {
+              "person": {
+                "type": "string",
+                "pattern": "^actor-[0-9]{3,}$"
+              },
+              "view": { "type": "string" }
+            }
+          },
+          "description": "Documented dissenting views at the time of the decision"
+        },
+        "still_valid": {
+          "type": "boolean",
+          "description": "Whether the rationale for this decision is still considered valid today"
+        },
+        "affects_workflows": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^wf-[0-9]{3,}$"
+          },
+          "description": "Workflow IDs that this decision directly affects"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Searchable topic tags"
+        }
+      }
+    },
+
+    "Commitment": {
+      "$id": "#/definitions/Commitment",
+      "title": "Commitment",
+      "description": "An explicit promise made between parties — customer, internal, or vendor",
+      "type": "object",
+      "required": ["id", "made_by", "made_to", "type", "description", "due_date", "status", "evidence_source", "related_workflow", "priority"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^com-[0-9]{3,}$",
+          "description": "Unique identifier for the commitment, format: com-NNN"
+        },
+        "made_by": {
+          "type": "string",
+          "pattern": "^actor-[0-9]{3,}$",
+          "description": "Actor ID of the person who made the commitment"
+        },
+        "made_to": {
+          "type": "string",
+          "description": "ID of the recipient — can be an actor-NNN or vo-NNN (for customer commitments)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["customer", "internal", "vendor", "board", "investor"],
+          "description": "Category of commitment"
+        },
+        "description": {
+          "type": "string",
+          "description": "Full description of what was promised, to whom, and in what context"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO 8601 date the commitment is/was due"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "fulfilled", "broken", "overdue", "at_risk", "cancelled"],
+          "description": "Current status of the commitment"
+        },
+        "evidence_source": {
+          "type": "string",
+          "description": "Where this commitment is documented (email, Slack, contract, meeting notes)"
+        },
+        "related_workflow": {
+          "type": "string",
+          "pattern": "^wf-[0-9]{3,}$",
+          "description": "The workflow most directly associated with delivering this commitment"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Business priority of this commitment"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional context, blockers, or updates on this commitment"
+        }
+      }
+    },
+
+    "ValueObject": {
+      "$id": "#/definitions/ValueObject",
+      "title": "ValueObject",
+      "description": "A product, customer, data asset, knowledge asset, or capital resource — something the company creates, owns, or is accountable for",
+      "type": "object",
+      "required": ["id", "type", "name", "description", "owner", "business_value", "connected_workflows", "health_status"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^vo-[0-9]{3,}$",
+          "description": "Unique identifier for the value object, format: vo-NNN"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "product",
+            "product_module",
+            "customer",
+            "internal_data_asset",
+            "internal_knowledge_asset",
+            "capital_asset",
+            "external_partner",
+            "vendor_contract",
+            "other"
+          ],
+          "description": "Category of value object"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 150,
+          "description": "Name of the value object"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this value object is and why it matters"
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^actor-[0-9]{3,}$",
+          "description": "Actor ID of the person accountable for this value object"
+        },
+        "business_value": {
+          "type": "string",
+          "description": "Qualitative or quantitative description of the business value this object represents"
+        },
+        "connected_workflows": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^wf-[0-9]{3,}$"
+          },
+          "description": "Workflow IDs that create, use, or maintain this value object"
+        },
+        "health_status": {
+          "type": "string",
+          "enum": ["healthy", "stable", "at_risk", "degraded", "expanding", "critical", "unknown"],
+          "description": "Current health or status of this value object"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Flexible key-value metadata specific to this value object type"
+        }
+      }
+    },
+
+    "Relationship": {
+      "$id": "#/definitions/Relationship",
+      "title": "Relationship",
+      "description": "An explicit edge between two entities in the graph",
+      "type": "object",
+      "required": ["id", "from_id", "to_id", "relationship_type", "description", "strength", "created_at"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^rel-[0-9]{3,}$",
+          "description": "Unique identifier for the relationship, format: rel-NNN"
+        },
+        "from_id": {
+          "type": "string",
+          "description": "The source entity ID (actor-NNN, wf-NNN, dec-NNN, com-NNN, or vo-NNN)"
+        },
+        "to_id": {
+          "type": "string",
+          "description": "The target entity ID (actor-NNN, wf-NNN, dec-NNN, com-NNN, or vo-NNN)"
+        },
+        "relationship_type": {
+          "type": "string",
+          "enum": [
+            "OWNS",
+            "DECIDED",
+            "AFFECTS",
+            "COMMITTED_TO",
+            "PRODUCES",
+            "TOUCHES",
+            "REPORTS_TO",
+            "BLOCKS",
+            "DEPENDS_ON",
+            "SUPERSEDES",
+            "CREATED_BY",
+            "PARTICIPATED_IN"
+          ],
+          "description": "The type of relationship between the two entities"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable explanation of this specific relationship"
+        },
+        "strength": {
+          "type": "string",
+          "enum": ["primary", "secondary", "weak"],
+          "description": "How strong or direct this relationship is"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date",
+          "description": "ISO 8601 date when this relationship was first established"
+        }
+      }
+    }
+  }
+}

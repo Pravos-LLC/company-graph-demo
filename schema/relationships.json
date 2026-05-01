@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vibrana.ai/company-graph/schema/relationships",
+  "title": "Company Graph Relationship Rules",
+  "description": "Defines allowed relationship types, valid source/target entity combinations, and semantic rules for edges in the Company Graph",
+
+  "relationship_types": [
+    {
+      "type": "OWNS",
+      "description": "An Actor is accountable for a Workflow or ValueObject. Implies primary responsibility.",
+      "valid_from": ["Actor"],
+      "valid_to": ["Workflow", "ValueObject", "Commitment"],
+      "cardinality": "one-to-many",
+      "bidirectional": false,
+      "example": "Nadia Kovalchuk OWNS the Month-End Close workflow"
+    },
+    {
+      "type": "DECIDED",
+      "description": "An Actor made or co-made a Decision. Multiple actors can DECIDE on the same Decision.",
+      "valid_from": ["Actor"],
+      "valid_to": ["Decision"],
+      "cardinality": "many-to-one",
+      "bidirectional": false,
+      "example": "Sarah Chen DECIDED the Salesforce over HubSpot selection"
+    },
+    {
+      "type": "AFFECTS",
+      "description": "One entity has a direct causal impact on another. Used for Decision→Workflow, Decision→Commitment, Commitment→Actor, and ValueObject→Workflow.",
+      "valid_from": ["Decision", "Commitment", "ValueObject", "Workflow"],
+      "valid_to": ["Workflow", "Commitment", "Actor", "ValueObject", "Decision"],
+      "cardinality": "many-to-many",
+      "bidirectional": false,
+      "example": "The tech debt freeze (Decision) AFFECTS the SSO commitment (Commitment)"
+    },
+    {
+      "type": "COMMITTED_TO",
+      "description": "An Actor made a Commitment. The Actor is the maker of record; the recipient is captured in the commitment's made_to field.",
+      "valid_from": ["Actor"],
+      "valid_to": ["Commitment"],
+      "cardinality": "one-to-many",
+      "bidirectional": false,
+      "example": "Ravi Patel COMMITTED_TO the SSO delivery for Hartfield"
+    },
+    {
+      "type": "PRODUCES",
+      "description": "A Workflow or ValueObject creates or generates another entity as its output. Captures data flow and dependency chains.",
+      "valid_from": ["Workflow", "ValueObject"],
+      "valid_to": ["ValueObject", "Workflow"],
+      "cardinality": "many-to-many",
+      "bidirectional": false,
+      "example": "The Sales Handoff workflow PRODUCES the context fed into Onboarding"
+    },
+    {
+      "type": "TOUCHES",
+      "description": "An Actor participates in or interacts with a Workflow without owning it. Lighter-weight than OWNS.",
+      "valid_from": ["Actor"],
+      "valid_to": ["Workflow"],
+      "cardinality": "many-to-many",
+      "bidirectional": false,
+      "example": "James Okafor TOUCHES the Customer Onboarding workflow when SSO setup is needed"
+    },
+    {
+      "type": "REPORTS_TO",
+      "description": "Organizational reporting relationship between two Actors.",
+      "valid_from": ["Actor"],
+      "valid_to": ["Actor"],
+      "cardinality": "many-to-one",
+      "bidirectional": false,
+      "example": "Yuki Tanaka REPORTS_TO Marcus Webb"
+    },
+    {
+      "type": "BLOCKS",
+      "description": "One entity prevents or delays another from proceeding. Strong causal dependency.",
+      "valid_from": ["Decision", "Commitment", "Workflow"],
+      "valid_to": ["Commitment", "Workflow", "ValueObject"],
+      "cardinality": "many-to-many",
+      "bidirectional": false,
+      "example": "The tech debt freeze BLOCKS the Hartfield SSO commitment delivery"
+    },
+    {
+      "type": "DEPENDS_ON",
+      "description": "One entity requires another to be complete or healthy before it can function correctly.",
+      "valid_from": ["Workflow", "ValueObject"],
+      "valid_to": ["Workflow", "ValueObject"],
+      "cardinality": "many-to-many",
+      "bidirectional": false,
+      "example": "The QBR Prep workflow DEPENDS_ON the Customer Data Platform"
+    },
+    {
+      "type": "SUPERSEDES",
+      "description": "A Decision overrides or replaces a prior Decision. Captures decision evolution over time.",
+      "valid_from": ["Decision"],
+      "valid_to": ["Decision"],
+      "cardinality": "one-to-one",
+      "bidirectional": false,
+      "example": "A new CRM decision would SUPERSEDE dec-001"
+    },
+    {
+      "type": "CREATED_BY",
+      "description": "A ValueObject or asset was created by a specific Actor or Workflow.",
+      "valid_from": ["ValueObject"],
+      "valid_to": ["Actor", "Workflow"],
+      "cardinality": "many-to-one",
+      "bidirectional": false,
+      "example": "The Customer Data Platform was CREATED_BY Dev Anand"
+    },
+    {
+      "type": "PARTICIPATED_IN",
+      "description": "An Actor was a significant stakeholder in a Decision (but not a decision-maker). Captures input without responsibility.",
+      "valid_from": ["Actor"],
+      "valid_to": ["Decision"],
+      "cardinality": "many-to-many",
+      "bidirectional": false,
+      "example": "Marcus Webb PARTICIPATED_IN the COO hiring decision without being the decider"
+    }
+  ],
+
+  "entity_id_prefixes": {
+    "Actor": "actor-",
+    "Workflow": "wf-",
+    "Decision": "dec-",
+    "Commitment": "com-",
+    "ValueObject": "vo-",
+    "Relationship": "rel-"
+  },
+
+  "validation_rules": [
+    {
+      "rule": "NO_SELF_LOOPS",
+      "description": "from_id and to_id must be different values"
+    },
+    {
+      "rule": "VALID_ENTITY_REFS",
+      "description": "All from_id and to_id values must reference entities that exist in the graph files"
+    },
+    {
+      "rule": "UNIQUE_RELATIONSHIP_IDS",
+      "description": "No two relationships can share the same id"
+    },
+    {
+      "rule": "VALID_COMMITMENT_RECIPIENT",
+      "description": "Commitment.made_to should reference an actor-NNN or vo-NNN that exists in the graph"
+    }
+  ],
+
+  "semantic_notes": {
+    "ownership": "Every Workflow should have at least one OWNS relationship from an Actor. Ownerless workflows are an institutional memory risk.",
+    "decisions": "Decisions without dissenting_views are incomplete — the absence of dissent is itself data and should be noted explicitly.",
+    "commitments": "Commitments with status 'overdue' or 'broken' that are not connected to any Decision represent untracked risk.",
+    "value_objects": "ValueObjects with health_status 'at_risk' or 'degraded' should have at least one Commitment or Decision connected to them describing the remediation plan."
+  }
+}
