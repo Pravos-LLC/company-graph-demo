@@ -27,14 +27,14 @@ The result is a graph you can query in natural language: "What decisions affect 
 
 ## Demo Company: Veridian
 
-This graph is seeded with data for **Veridian** — a fictional 75-person B2B SaaS company that builds workflow automation tools for mid-market finance teams.
+This graph is seeded with data for **Veridian** — a fictional 150-person B2B SaaS company that builds workflow automation tools for mid-market finance teams.
 
-- **Founded:** 2018 | **Stage:** Series B ($22M raised) | **HQ:** London + remote
-- **ARR:** ~£3.8M | **Team:** 75 people across 6 time zones
+- **Founded:** 2018 | **Stage:** Series B (£38M raised November 2023) | **HQ:** London + remote
+- **ARR:** £8.2M | **NRR:** 112% | **Active customers:** 89 | **Team:** 150 people across 6 time zones
 - **Core product:** Finance workflow automation platform
 - **Key problem:** Classic institutional memory failure — undocumented decisions, broken customer commitments no one tracks, and AI pilots that fizzled without anyone knowing why
 
-The demo data is intentionally rich: real-sounding names, specific dollar amounts, documented disagreements, and commitments that are actively broken. It's designed to make the query experience compelling and recognizable to enterprise leadership teams.
+The demo data is intentionally rich: real-sounding names, specific pound amounts, documented disagreements, and commitments that are actively broken. It's designed to make the query experience compelling and recognizable to enterprise leadership teams.
 
 ---
 
@@ -79,11 +79,11 @@ Checks JSON syntax, ID format, cross-references, and business logic. Use this af
 
 ## What's in the Graph
 
-### Actors (12)
+### Actors (20)
 
-The Veridian leadership team and key individual contributors — from CEO Sarah Chen and CTO Marcus Webb to Lead Engineer James Okafor and Senior CS Manager Chloe Beaumont. Each actor includes their tools, workflows, reporting structure, and qualitative notes about their role in the organization's story.
+The Veridian leadership team and key individual contributors — from CEO Sarah Chen and CTO Marcus Webb to VP Engineering Oliver Mwangi, Head of Marketing Sophie Laurent, and Financial Controller Kwame Asante. Each actor includes their tools, workflows, reporting structure, and qualitative notes about their role in the organization's story.
 
-### Workflows (15)
+### Workflows (18)
 
 Across every function:
 - Finance: Month-End Close (38 hrs/month, high AI opportunity), Invoice Reconciliation
@@ -91,51 +91,58 @@ Across every function:
 - CS: Ticket Triage, Customer Onboarding, Contract Renewal
 - Product: Spec to Ticket, QBR Prep
 - Sales: New Business, Handoff to CS
+- Legal: Security & Compliance Review (new — legal turnaround is the #1 deal-slippage driver)
+- Marketing: Campaign Performance Review (new — attribution broken due to HubSpot/Salesforce split)
+- People: New Employee Onboarding (new — docs last updated 2024)
 - Leadership: Quarterly Planning, Annual Strategy
 
 Every workflow includes AI readiness scores (1–10), specific pain points, and an AI opportunity summary.
 
-### Decisions (9)
+### Decisions (12)
 
 The decisions that shaped how Veridian operates — each with full rationale, alternatives considered, and documented dissent:
 
 - Why they chose Salesforce over HubSpot (and why Sales disagreed)
 - Why they killed an AI pilot for CS triage in 2024
-- Why customer onboarding was moved back to CS (a decision now being quietly revisited)
+- Why customer onboarding was moved back to CS (a decision partially reversed by dec-012)
 - Why they standardized on Linear over Jira
-- Why they delayed self-serve (a CEO vs. Head of Product debate that's still running)
+- Why they delayed self-serve (a CEO vs. Head of Product debate still running)
 - Why the COO was hired externally, bypassing two internal candidates
 - Why they froze all feature development in Q1 2026 to pay down tech debt
-- Why a commitment tracking system was scoped and then deferred (a decision now recognized as a mistake)
+- Why a commitment tracking system was scoped and then deferred (now recognized as a mistake)
+- **New:** Why VP Engineering was hired externally instead of promoting Yuki (Marcus strongly opposed it)
+- **New:** Why HubSpot and Salesforce were adopted as a split stack (attribution never worked)
+- **New:** Why a dedicated Head of Customer Onboarding role was created, partially reversing dec-003
 
-### Commitments (12)
+### Commitments (14)
 
 A mix of customer, internal, and board-level commitments at various stages:
 
 | Status | Count |
 |---|---|
-| Open | 6 |
+| Open | 8 |
 | Fulfilled | 2 |
-| Broken | 2 |
+| Broken | 3 |
 | Overdue | 1 |
 | At Risk | 1 |
 
-Critical open items include a CEO-level personal commitment to Hartfield Group's CFO and a Series C financial model due April 30.
+Critical open items include a CEO-level personal commitment to Hartfield Group's CFO, a Series C financial model due April 30, and a new HubSpot-Salesforce attribution commitment with a known unscheduled dependency. Two new commitments: Oliver Mwangi's runbook coverage promise to Marcus (broken), and Sophie Laurent's attribution commitment to Sarah (open, at risk).
 
 ### Value Objects (9)
 
-- **Veridian Platform** — the core SaaS product (stable, 47 customers)
+- **Veridian Platform** — the core SaaS product (stable, 89 customers, £8.2M ARR)
 - **Finance Workflow Engine** — the most-used module (degraded, 34% test coverage)
 - **Hartfield Group** — largest customer by ARR, at-risk due to SSO commitment breach
 - **Meridian Capital** — expanding customer with two untracked commitment risks
+- **Solaris Financial** — recently renewed, dedicated CSM still unassigned
 - **Customer Data Platform** — internal data infrastructure owned by Dev Anand
 - **Engineering Runbook Library** — degraded, 60% coverage, being remediated
-- **Sales Commitment Log** — Chloe Beaumont's personal Notion doc that is the company's only commitment tracker (the single point of failure)
-- **Series B Funding** — 26 months runway, targeting Series C in H2 2026
+- **Sales Commitment Log** — Chloe Beaumont's personal Notion doc (the single point of failure)
+- **Series B Funding** — £38M raised, 28 months runway, targeting Series C in H2 2026 at £12M+ ARR
 
-### Relationships (35)
+### Relationships (65)
 
-Explicit edges covering: ownership chains, decision-to-workflow effects, commitment blockers, data flow between workflows, and the causal chain from a 2025 decision to a 2026 customer crisis.
+Explicit edges covering: ownership chains, reporting lines, decision-to-workflow effects, commitment blockers, data flow between workflows, and the causal chain from a 2023 hiring decision to a 2026 engineering org dynamic.
 
 ---
 
@@ -155,9 +162,21 @@ Query: `"Why do we keep breaking commitments and what should we do about it?"`
 
 ### The AI Opportunity Map
 
-Eight of Veridian's 15 workflows score 7+ on AI readiness. The top candidates — invoice reconciliation, spec-to-ticket generation, and month-end close — collectively represent 50–60 hours of automatable work per month. The one previous AI pilot (CS triage) failed due to the wrong tool and no change management, leaving the team wary.
+Eight of Veridian's 18 workflows score 7+ on AI readiness. The top candidates — invoice reconciliation, spec-to-ticket generation, month-end close, and the new security questionnaire workflow — collectively represent 50–70 hours of automatable work per month. The one previous AI pilot (CS triage) failed due to the wrong tool and no change management, leaving Amara Diallo and Priya Sharma wary.
 
 Query: `"Where should we start with AI and why?"`
+
+### The Engineering Org Tension
+
+Sarah Chen hired Oliver Mwangi as VP Engineering in 2023 over Marcus Webb's strong objection — Marcus wanted to promote Yuki Tanaka and considered the external hire a trust violation. Yuki now reports to Oliver. Oliver broke his first major commitment to Marcus (runbook coverage by Q1 2026). The dynamics this created are a retention risk for Yuki.
+
+Query: `"What is the engineering org situation and what are the retention risks?"`
+
+### The Attribution Black Hole
+
+Sophie Laurent joined with a HubSpot preference. The company adopted a split HubSpot/Salesforce stack in 2022 to accommodate her. The sync has never worked cleanly. Marketing ROI is unmeasurable. Sophie committed to fix it by Q2 2026. The engineer who needs to do the work (Ben Osei) hasn't been told.
+
+Query: `"Why can't we measure marketing ROI and what's the plan to fix it?"`
 
 ---
 
@@ -171,12 +190,12 @@ company-graph-demo/
 │   ├── entities.json            JSON Schema (draft-07) for all 6 entity types
 │   └── relationships.json       Allowed relationship types + validation rules
 ├── graph/
-│   ├── actors.json              12 people and teams
-│   ├── workflows.json           15 business processes
-│   ├── decisions.json           9 key decisions with full rationale
-│   ├── commitments.json         12 commitments (open, fulfilled, broken)
-│   ├── value-objects.json       9 products, customers, assets
-│   └── relationships.json       35 explicit edges
+│   ├── actors.json              20 people and teams
+│   ├── workflows.json           18 business processes
+│   ├── decisions.json           12 key decisions with full rationale
+│   ├── commitments.json         14 commitments (open, fulfilled, broken)
+│   ├── value-objects.json       11 products, customers, assets
+│   └── relationships.json       65 explicit edges
 ├── scripts/
 │   ├── validate.sh              Validate graph integrity
 │   ├── stats.sh                 Print graph summary
@@ -184,19 +203,24 @@ company-graph-demo/
 ├── .claude/
 │   └── settings.json            Claude Code agent permissions
 └── sentra/
+    ├── sync.sh                  Main sync script — pulls from Sentra API
     ├── entity-mapping.md        How our schema maps to Sentra's 6 entities
-    └── integration-guide.md     Steps to connect Sentra as live data source
+    ├── integration-guide.md     Steps to connect Sentra as live data source
+    └── mock-responses/
+        ├── decisions.json       Sample Sentra API decisions response
+        └── commitments.json     Sample Sentra API commitments response
 ```
 
 ---
 
 ## From Demo to Production
 
-This repo demonstrates the Company Graph concept with manually curated data. A production deployment replaces the JSON files with a live data source — specifically [Sentra](https://sentra.ai), which auto-extracts organizational entities from Slack, Google Workspace, Linear, Salesforce, and other tools.
+This repo demonstrates the Company Graph concept with manually curated data. A production deployment replaces the JSON files with a live data source — specifically [Sentra](https://sentra.app), which auto-extracts organizational entities from Slack, Google Workspace, Linear, and other tools.
 
 The key insight: **Sentra provides the observational layer** (what happened, who said what) while the Company Graph provides **the interpretive layer** (why it happened, what it means, what's at risk). Both are required for institutional memory that actually works.
 
 See:
+- [`sentra/sync.sh`](sentra/sync.sh) — run `./sentra/sync.sh --mock` to test the pipeline
 - [`sentra/entity-mapping.md`](sentra/entity-mapping.md) — how the schemas align
 - [`sentra/integration-guide.md`](sentra/integration-guide.md) — step-by-step setup
 

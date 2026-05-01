@@ -1,180 +1,168 @@
 # Sentra Entity Mapping — Veridian Company Graph
 
-This document maps Veridian's 6 Company Graph entity types to Sentra's 6-entity organizational memory model, explaining what each system captures, how the schemas align, and which data Sentra auto-populates versus what requires manual seeding.
+How Veridian's Company Graph schema maps to Sentra's 6-entity organizational memory model. This document defines what Sentra auto-populates, what requires manual input, how confidence scores drive the import pipeline, and how conflicts between Sentra and the manual graph are resolved.
 
 ---
 
-## Entity Mapping Table
+## 1. Entity Mapping Table
 
 | Veridian Entity | Sentra Entity | Alignment | Notes |
 |---|---|---|---|
-| **Actor** | **Actor** | Direct | Same concept. Sentra auto-populates from connected directory/HR systems. |
-| **Workflow** | **Interaction** | Partial | Sentra captures individual interaction instances; Veridian generalizes to workflow patterns. |
-| **Decision** | **Decision** | Direct | Same concept. Sentra extracts from meeting transcripts and documents. |
-| **Decision.rationale** | **Rationale** | Sub-entity | Veridian embeds rationale inside Decision; Sentra treats it as a separate linked entity. |
-| **Commitment** | **Commitment** | Direct | Same concept. Sentra extracts from email and Slack; Veridian seeds manually. |
-| **ValueObject** | **Value-Creating Object** | Direct | Same concept. Sentra infers from document mentions; Veridian seeds explicitly. |
-| **Relationship** | *(implicit edges)* | Structural | Sentra manages edges natively in its graph store; Veridian externalizes them in relationships.json. |
+| **Actor** | **Actor** | Direct | Same concept. Sentra auto-populates identity, role, and tool usage from connected directory/HR systems. |
+| **Workflow** | **Interaction** | Partial | Sentra captures individual event instances; Veridian generalizes to repeatable process patterns. Manual authorship required for workflow definitions. |
+| **Decision** | **Decision** | Direct | Highest-value mapping. Sentra extracts from meeting transcripts and Slack. Rationale and dissenting views require human completion. |
+| **Decision.rationale** | **Rationale** | Sub-entity | Veridian embeds rationale inside Decision; Sentra treats it as a linked entity. Export rationale manually when seeding Sentra. |
+| **Commitment** | **Commitment** | Direct | Strong mapping. Sentra extracts informal commitments from Slack and email well; formal customer commitments from Salesforce require the Salesforce connector or manual seeding. |
+| **ValueObject** | **Value-Creating Object** | Partial | Sentra infers from mention frequency. Classification, business value, and health status require human judgment. |
+| **Relationship** | *(implicit graph edges)* | Structural | Sentra manages edges natively. Veridian externalizes them in `relationships.json`. The sync script does not import relationships — they are manually authored. |
 
 ---
 
-## Detailed Mapping by Entity
+## 2. Field-Level Mapping: What Sentra Auto-Populates vs. Manual
 
-### Actors → Sentra Actors
+### Actors
 
-**What matches:**
-Sentra's Actor entity captures `name`, `role`, `team`, `tools`, and organizational hierarchy. This maps directly to Veridian's Actor schema including `role`, `job_family`, `reports_to`, and `tools_used`.
+| Veridian Field | Sentra Auto-Populates? | Source | Manual Input Required |
+|---|---|---|---|
+| `name` | Yes | Google Workspace / Slack directory | No |
+| `role` | Yes | Rippling HR or Workspace title | Verify on changes |
+| `job_family` | Partial | Inferred from department | Map to Veridian job families |
+| `tools_used` | Partial | OAuth-connected apps; incomplete | Complete with less-visible tools |
+| `reports_to` | Yes | Google Workspace org chart | No |
+| `joined_date` | Yes | Rippling HR | No |
+| `location` | Yes | Workspace profile | No |
+| `current_workflows` | No | Sentra models instances, not patterns | Manual — requires understanding which workflows the actor is involved in |
+| `notes` | No | Qualitative context can't be inferred | Manual — the most important field for demo quality |
 
-**What Sentra auto-populates:**
-- Identity from Google Workspace or Slack directory
-- Role from HR system (Rippling integration)
-- Tool usage inferred from OAuth-connected app activity
-- Reporting structure from Google Workspace org chart
+### Workflows
 
-**What requires manual seeding:**
-- `current_workflows` — Sentra doesn't model repeatable workflow patterns, only interaction instances
-- `notes` — Qualitative context about an actor's history, skepticism, or informal influence
-- `joined_date` — Must be synced from Rippling or HR system
+Workflows are **entirely manually authored** in Veridian's schema. Sentra surfaces interaction instances (meeting: "Sprint Planning — March 25", Slack thread: "#incident-20260312") that can be used to enrich or verify workflow definitions, but the process abstraction itself requires human judgment.
 
-**Schema difference:** Sentra's Actor may include communication patterns (average response time, active hours) inferred from Slack. Veridian's schema doesn't currently capture this but should be added.
-
----
-
-### Workflows → Sentra Interactions
-
-**What matches:**
-Sentra's Interaction entity represents a discrete event (a meeting, a document creation, a Slack thread). Veridian's Workflow represents the *pattern* — the repeatable process that many Interaction instances constitute.
-
-**The gap:** This is the most significant schema difference. Sentra doesn't natively model repeatable process patterns — it surfaces individual instances. To bridge this:
-
-- Veridian's `workflow.json` entries remain manually curated (the process definition)
-- Sentra provides the *evidence* that a workflow is happening — the actual meeting records, documents, and communication patterns
-- A Sentra export query can pull all Interactions tagged to a workflow category and hydrate the `steps[]` and `tools_used[]` fields over time
-
-**What Sentra auto-populates:**
-- Instances of workflow execution (meeting: "Month-End Close review", document: "February P&L")
-- Participants in each workflow instance
-- Tools used in each instance (via Slack integrations and document metadata)
-
-**What requires manual seeding:**
-- Workflow definitions (trigger, output, steps, pain_points)
-- `ai_readiness_score` and `ai_candidate` — these are assessments, not observations
-- `avg_time_hours` — must be estimated or measured separately
-
----
-
-### Decisions → Sentra Decisions
-
-**What matches:**
-This is the most direct mapping. Sentra's Decision entity is structurally identical to Veridian's. Both capture: decision description, maker(s), date, context, and outcomes.
-
-**What Sentra auto-populates:**
-- Decision text extracted from meeting transcripts (requires meeting transcription via Zoom or Google Meet)
-- Decision makers inferred from participants and speaking patterns
-- Date from transcript metadata
-- Links to source documents and Slack threads where the decision was discussed
-
-**What requires manual seeding (initially):**
-- `alternatives_considered` — Sentra may surface alternatives mentioned in transcripts, but structured capture of rejected options requires human review
-- `rationale` — Deep rationale is rarely stated explicitly in meetings; requires interview or document annotation
-- `dissenting_views` — Often expressed informally or not at all in recorded meetings; requires deliberate capture process
-- `still_valid` — A retrospective judgment that must be made by a human
-
-**Sentra-specific enrichment:**
-Sentra can surface the *trail* of discussions that led to a decision — the Slack threads, the pre-reads, the side conversations. This contextual network is not captured in Veridian's JSON structure but is accessible via the Sentra API.
-
----
-
-### Decision.rationale → Sentra Rationale
-
-**What matches:**
-Sentra models Rationale as a first-class entity, separate from Decision. This is architecturally cleaner than Veridian's approach (rationale embedded as a field inside Decision).
-
-**What Sentra auto-populates:**
-- Rationale fragments extracted from documents, emails, and meeting transcripts associated with the decision
-- Confidence scores for extracted rationale (how clearly stated it was)
-
-**What requires manual seeding:**
-- Structured rationale as written in Veridian's `decisions.json` — this is typically more complete and deliberate than what Sentra can auto-extract
-- For legacy decisions (pre-Sentra), all rationale must be seeded manually
-
-**Migration recommendation:** When connecting Sentra, export existing `decisions[].rationale` fields and ingest them as Sentra Rationale entities linked to their parent Decisions. This preserves institutional memory that Sentra cannot retroactively discover.
-
----
-
-### Commitments → Sentra Commitments
-
-**What matches:**
-Sentra's Commitment entity maps closely to Veridian's. Both track: who made the commitment, to whom, what was promised, and the status.
-
-**What Sentra auto-populates:**
-- Commitment text extracted from email and Slack (e.g., "I'll have that to you by Friday")
-- Commitment maker inferred from message sender
-- Due dates extracted from natural language date references
-- Status inferred by looking for confirmation messages after due date
-
-**The gap:** Sentra's auto-extraction works well for informal commitments in communication tools. Veridian's most important commitments (customer promises in sales calls, contract addenda) live in Salesforce and DocuSign — not email or Slack. These require a Salesforce connector or manual entry.
-
-**What requires manual seeding:**
-- Formal customer commitments from Salesforce opportunity notes
-- Contract-level commitments from DocuSign/legal documents
-- `priority` classification
-- `evidence_source` — the specific document or message where it's captured
-
-**Critical gap for Veridian:** The Hartfield SSO commitment (com-001) was made verbally on a call and noted in Salesforce — not in Slack or email. Sentra would not auto-discover this. This class of commitment must be manually seeded and is precisely the institutional memory gap the graph is designed to solve.
-
----
-
-### ValueObjects → Sentra Value-Creating Objects
-
-**What matches:**
-Sentra's Value-Creating Objects represent outcomes, products, and assets the organization produces or maintains. This maps to Veridian's `ValueObject` entity.
-
-**What Sentra auto-populates:**
-- Products and features mentioned frequently in internal documents
-- Customers mentioned in communication patterns
-- Projects inferred from Linear or GitHub activity
-
-**What requires manual seeding:**
-- Formal classification (`type`: product / customer / data asset / capital asset)
-- `business_value` — a qualitative or financial statement that requires human judgment
-- `health_status` — a deliberate assessment, not an observable metric
-- Internal knowledge assets (runbook library, commitment log) that aren't prominently mentioned in communication tools
-
----
-
-## Auto-Populate vs. Manual Seed — Summary
-
-| Field | Sentra Auto-Populates? | Notes |
+| Veridian Field | Sentra Auto-Populates? | Notes |
 |---|---|---|
-| Actor identity, role, team | Yes | Requires Google Workspace + Rippling connectors |
-| Actor tools used | Partial | Inferred from OAuth apps; not comprehensive |
-| Workflow definitions | No | Must be manually authored |
-| Workflow pain points | No | Human assessment |
-| AI readiness scores | No | Human assessment |
-| Decision text | Yes (from transcripts) | Requires meeting transcription |
-| Decision rationale | Partial | Surface-level; deep rationale needs human input |
-| Decision dissenting views | No | Rarely explicit in transcripts |
-| Informal commitments | Yes | Slack/email extraction |
-| Formal customer commitments | No | Requires Salesforce connector or manual entry |
-| Commitment status | Partial | Infers fulfillment from follow-up messages |
-| Product/customer as value objects | Partial | Infers from mention frequency |
-| Business value of value objects | No | Human judgment |
-| Health status | No | Human assessment |
-| Relationship edges | Partial | Infers co-occurrence; not causal structure |
+| `name` | No | Human-authored |
+| `trigger` | No | Human-authored |
+| `steps` | No | Human-authored |
+| `tools_used` | Partial | Sentra can surface tools mentioned in workflow-related interactions |
+| `avg_time_hours` | No | Requires measurement or estimation |
+| `pain_points` | No | Qualitative — requires interviews or observation |
+| `ai_readiness_score` | No | Human assessment |
+| `ai_candidate` | No | Human judgment |
 
-**Rule of thumb:** Sentra provides the *observational* layer (what happened, who talked to whom, what was said). Veridian's graph provides the *interpretive* layer (why it happened, what it means, what should be done). Both are required for a complete picture.
+### Decisions
+
+Decisions are Sentra's highest-value auto-extraction target and the entity type most likely to have useful data in `sentra/mock-responses/decisions.json`.
+
+| Veridian Field | Sentra Auto-Populates? | Confidence | Notes |
+|---|---|---|---|
+| `title` | Yes | High | Extracted from meeting transcript or document |
+| `made_by` | Yes | Medium | Inferred from speaker/sender — verify |
+| `made_at` | Yes | High | From source metadata |
+| `summary` | Yes | High | LLM summary of the source excerpt |
+| `context` | Partial | Low | Background context rarely stated explicitly; often requires additional interviews |
+| `alternatives_considered` | Partial | Low | Surface-level only; structured capture requires human review |
+| `rationale` | Partial | Medium | May be stated in source; deep rationale needs annotation |
+| `dissenting_views` | Rarely | Very Low | Disagreements expressed informally or not at all in transcripts |
+| `outcome` | No | — | Retrospective; human authorship only |
+| `still_valid` | No | — | Human judgment |
+| `affects_workflows` | No | — | Cross-entity linkage requires human knowledge |
+
+### Commitments
+
+| Veridian Field | Sentra Auto-Populates? | Confidence | Notes |
+|---|---|---|---|
+| `made_by` | Yes | High | From message sender |
+| `made_to` | Yes | High | From message recipient or named party |
+| `type` | Partial | Medium | Infers customer vs. internal from context |
+| `description` | Yes | High | LLM summary of the commitment text |
+| `due_date` | Partial | Medium | Extracted if stated; often missing from informal Slack messages |
+| `status` | Partial | Low | Infers from follow-up messages; unreliable for complex commitments |
+| `evidence_source` | Yes | High | Source metadata (channel, message ID, meeting title) |
+| `priority` | No | — | Human judgment |
+| `notes` | Partial | Low | Basic context only; rich notes are human-authored |
+
+**Critical gap:** Customer commitments made in sales calls (e.g., com-001 Hartfield SSO, com-011 Meridian CSV export) are documented in Salesforce opportunity notes, not Slack or email. Sentra will not auto-discover these without the Salesforce connector. This class of commitment — the highest-stakes type — must be manually seeded or requires Salesforce connector configuration.
+
+### Value Objects
+
+| Veridian Field | Sentra Auto-Populates? | Notes |
+|---|---|---|
+| `name` | Partial | Inferred from frequent mentions in documents and communication |
+| `type` | No | Human classification required |
+| `description` | No | Human-authored |
+| `business_value` | No | Financial or qualitative assessment; human judgment |
+| `health_status` | No | Deliberate assessment — not an observable |
+| `owner` | Partial | Inferred from who mentions/manages the object most frequently |
 
 ---
 
-## Recommended Integration Approach
+## 3. Confidence Score Thresholds
 
-1. **Phase 1 — Manual seed** (this repo): Establish the interpretive layer with rich, high-quality data about the company's key entities. This is the starting point.
+Sentra assigns a `confidence_score` (0.0–1.0) to each auto-extracted entity. The sync script uses these thresholds:
 
-2. **Phase 2 — Connect Sentra**: Wire Sentra to Slack, Google Workspace, Linear, and Salesforce. Let Sentra begin building the observational layer.
+| Threshold | Behaviour | Action Required |
+|---|---|---|
+| **≥ 0.75** | Auto-import queue | Appended to graph with `_review_status: "pending_human_review"`. Operator assigns a sequential ID and completes `__NEEDS_HUMAN_INPUT__` fields. |
+| **0.50–0.74** | Human review queue | Not auto-imported. Surfaced in Sentra UI for review. Operator decides: promote to graph (with enrichment), dismiss, or request Sentra re-extract with corrections. |
+| **< 0.50** | Ignored | Entity logged but discarded. Low confidence typically means the extraction was ambiguous — often a conversational mention rather than a real decision or commitment. |
 
-3. **Phase 3 — Sync**: Build a scheduled export from Sentra's API that hydrates or validates the manually-curated entities. New commitments discovered by Sentra are flagged for human review and promotion to `commitments.json`.
+**Why 0.75?** Below this threshold, the extraction quality tends to be noisy enough that human review is faster than trying to fix a bad auto-import. Above it, the summary and key fields are usually accurate enough to serve as a starting draft.
 
-4. **Phase 4 — Live graph**: The Company Graph is continuously updated by Sentra, with humans retaining editorial control over decisions, rationale, and assessments.
+**Adjusting thresholds:** Edit the `jq` filter in `sentra/sync.sh` (lines referencing `select(.confidence_score >= 0.75)`). If Sentra's extraction quality improves over time (as it trains on your organization's patterns), consider lowering to 0.70.
 
-See `integration-guide.md` for step-by-step technical setup instructions.
+---
+
+## 4. Conflict Resolution
+
+When Sentra's auto-extracted data contradicts what's already in the manual graph, the following rules apply:
+
+### Rule 1: Manual data wins on fields that require judgment
+
+Fields like `rationale`, `dissenting_views`, `outcome`, `still_valid`, `notes`, `ai_readiness_score`, and `health_status` represent human interpretation. If a manually authored field conflicts with a Sentra inference, the manual field is authoritative and Sentra's version is stored in a `_sentra_*` prefixed field for reference.
+
+### Rule 2: Sentra wins on observable facts
+
+Fields like `made_at` (date extracted from source metadata), `evidence_source` (document/message reference), and `made_by` (sender identity) are directly observable. If the manual graph has an incorrect date and Sentra has the correct one from transcript metadata, update the manual record.
+
+### Rule 3: New Sentra entities don't overwrite existing manual entities
+
+The sync script appends new entities — it does not perform update-in-place for existing entities matched by ID. If Sentra surfaces a decision that's already in the graph (same title, same date), the operator should manually review and merge. A future version of the sync script could support `--update-existing` with explicit conflict flags.
+
+### Rule 4: For commitments, Salesforce is authoritative over Sentra
+
+Customer commitments where the evidence source is a Salesforce opportunity record take precedence over Sentra's Slack/email extractions. If they conflict, the Salesforce record is correct. This reflects the fact that Ravi Patel's sales commitments are captured in Salesforce, not Slack.
+
+### Rule 5: Flag conflicts, don't silently resolve them
+
+When a conflict is detected, the sync script prefixes the affected field with `_conflict_` and logs a warning. Example:
+
+```json
+"made_at": "2024-10-14",
+"_conflict_made_at_sentra": "2024-10-16",
+"_conflict_note": "Manual record says Oct 14; Sentra transcript metadata says Oct 16. Verify with Salesforce opportunity note."
+```
+
+---
+
+## 5. Entities Sentra Won't Find (Must Be Manually Seeded)
+
+These entity types require manual authorship and will never be auto-discovered by Sentra:
+
+- **Workflow definitions** — the repeatable process abstraction, not an observable event
+- **AI readiness scores** — analytical assessment
+- **Decisions from before Sentra was connected** — no historical observability
+- **Dissenting views** — rarely stated explicitly in meetings; requires deliberate documentation practice
+- **Customer commitments made verbally on calls** — unless call transcription is enabled via Gong or Zoom
+- **Health status assessments** — requires context that Sentra can't infer
+
+The recommendation: treat the manually curated graph as the starting state (Phase 1), connect Sentra to augment it with observations (Phase 2), and progressively reduce the manual maintenance burden over time. The graph never becomes fully automated — the interpretive layer always requires human judgment.
+
+---
+
+## 6. Schema Differences to Be Aware Of
+
+**Sentra Rationale as a separate entity:** Sentra models `Rationale` as a first-class linked entity, not a field inside Decision. When seeding Veridian's decisions into Sentra, export the `decisions[].rationale` fields and ingest them as Sentra Rationale entities linked to their parent Decisions.
+
+**Sentra's interaction volume:** Sentra surfaces many more interaction instances than Veridian has workflows. A single workflow like "Engineering Sprint Planning" might generate 20+ Sentra interaction records per quarter (each sprint planning meeting). The sync script intentionally does not import interactions — they are accessible via the Sentra UI and API but the workflow-level abstraction is maintained manually.
+
+**Participant vs. actor:** Sentra's `participants[]` array in decisions and commitments contains name strings, not actor IDs. The sync script maps these to `made_by: "Name"` strings. After auto-import, the operator should replace name strings with the corresponding `actor-NNN` IDs for full graph traversal to work.

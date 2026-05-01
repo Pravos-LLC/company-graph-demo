@@ -53,7 +53,7 @@
         "reason_rejected": "Rejected as a short-term patch; didn't address root cause."
       }
     ],
-    "outcome": "Pilot terminated July 2024. No AI tooling currently deployed in CS workflow. The triage problem remains unsolved. Priya is cautious about re-engaging with AI for this workflow without a clearer proof of concept.",
+    "outcome": "Pilot terminated July 2024. No AI tooling currently deployed in CS workflow. The triage problem remains unsolved. Priya is cautious about re-engaging with AI for this workflow without a clearer proof of concept. Amara Diallo (actor-018), who was PM on the pilot, carries scar tissue that surfaces when new AI proposals come to Product.",
     "rationale": "The tool was domain-agnostic and had not been trained on finance workflow terminology. The classification confidence was too low for CSMs to trust without verification. More importantly, the pilot lacked a proper change management plan — CSMs weren't bought in and used the tool inconsistently from day one.",
     "dissenting_views": [
       {
@@ -86,7 +86,7 @@
         "reason_rejected": "No partner network in place; building one was estimated at 6 months minimum."
       }
     ],
-    "outcome": "Onboarding absorbed by CS in October 2023. Average onboarding time has grown from 3 weeks to 6 weeks. Customer satisfaction during onboarding has declined (NPS at onboarding down from +42 to +28). The decision is now being quietly revisited.",
+    "outcome": "Onboarding absorbed by CS in October 2023. Average onboarding time grew from 3 weeks to 6 weeks. Customer satisfaction during onboarding declined (NPS at onboarding down from +42 to +28). The decision was partially reversed in 2024 when Wei Zhang was hired as Head of Customer Onboarding (actor-019, dec-012). Onboarding time recovered to 4 weeks by Q4 2024.",
     "rationale": "The primary driver was cost reduction ahead of Series B. The secondary rationale — that onboarding and CS are naturally aligned — was never validated. The hidden cost was CSM time dilution and onboarding quality decline.",
     "dissenting_views": [
       {
@@ -140,7 +140,7 @@
     "title": "Delayed building self-serve tier — defer to Series C",
     "made_by": ["actor-001", "actor-004"],
     "made_at": "2024-01-15",
-    "summary": "Despite recurring demand signals, Veridian decided to defer building a self-serve product tier until after its Series C fundraise, expected in 2026.",
+    "summary": "Despite recurring demand signals, Veridian decided to defer building a self-serve product tier until after its Series C fundraise, expected in H2 2026.",
     "context": "Veridian has received consistent inbound interest from companies with <50 employees who can't afford the enterprise price point (£2,500+/month). Product ran an internal analysis in Q4 2023 showing ~180 waitlisted companies. The debate between Sarah Chen and Tom Adeyemi has been ongoing since 2022.",
     "alternatives_considered": [
       {
@@ -174,7 +174,7 @@
     "made_by": ["actor-001"],
     "made_at": "2024-08-01",
     "summary": "Sarah Chen hired Fatima Al-Rashid as COO from an external search, passing over two internal candidates who had been informally positioned for the role.",
-    "context": "By mid-2024, Veridian had grown to 65 people and was showing operational strain. Sarah was spending 40% of her time on operational coordination that should have been handled by a COO. Two internal candidates — the Head of People (Anya Volkov) and the Director of Revenue Operations — had both expressed interest in the role.",
+    "context": "By mid-2024, Veridian had grown to 90 people and was showing operational strain. Sarah was spending 40% of her time on operational coordination that should have been handled by a COO. Two internal candidates — the Head of People (Anya Volkov) and the Director of Revenue Operations — had both expressed interest in the role.",
     "alternatives_considered": [
       {
         "name": "Promote Anya Volkov (Head of People) to COO",
@@ -218,7 +218,7 @@
         "reason_rejected": "Xero's native automation doesn't cover the Salesforce reconciliation step, which is the highest-friction task."
       }
     ],
-    "outcome": "Evaluation in progress as of Q1 2026. Nadia is leading with support from Dev Anand (data infrastructure) and an external AI consultant. Early results on invoice reconciliation matching are promising (~94% auto-match rate in testing).",
+    "outcome": "Evaluation in progress as of Q1 2026. Nadia is leading with support from Dev Anand (data infrastructure) and an external AI consultant. Early results on invoice reconciliation matching are promising (~94% auto-match rate in testing). Kwame Asante is the primary practitioner being observed in the evaluation.",
     "rationale": "Three converging factors: (1) Nadia's documented evidence of time waste, (2) Series C narrative benefit of demonstrating AI-augmented operations, (3) Fatima's mandate to reduce operational friction. This is also intended to serve as an internal proof point for Veridian's enterprise clients — 'we use AI in our own ops.'",
     "dissenting_views": [
       {
@@ -236,7 +236,7 @@
     "made_by": ["actor-002", "actor-005", "actor-001"],
     "made_at": "2025-12-10",
     "summary": "After a Q4 2025 engineering retrospective showed that 40% of sprint capacity was being consumed by bugs and unplanned work, leadership approved a full feature freeze for Q1 2026.",
-    "context": "At the 2025 year-end engineering retrospective, Yuki Tanaka presented data that shocked the leadership team: unplanned work (bug fixes, incidents, and firefighting) had consumed on average 38–42% of engineering capacity for the prior two quarters. Three major customer-impacting incidents in Q4 2025 accelerated the decision.",
+    "context": "At the 2025 year-end engineering retrospective, Yuki Tanaka presented data that shocked the leadership team: unplanned work (bug fixes, incidents, and firefighting) had consumed on average 38–42% of engineering capacity for the prior two quarters. Three major customer-impacting incidents in Q4 2025 accelerated the decision. At 45 engineers across 5 squads, the tech debt was now compounding at scale.",
     "alternatives_considered": [
       {
         "name": "Allocate 20% of each sprint to tech debt without feature freeze",
@@ -251,7 +251,7 @@
         "reason_rejected": "Marcus rejected this — he argued a partial freeze would still allow product pressure to encroach and wouldn't send a clear enough signal."
       }
     ],
-    "outcome": "Feature freeze in effect from January 6, 2026. Three engineering squads working exclusively on: (1) database schema refactoring, (2) test coverage improvement (from 34% to 70% target), (3) incident tooling and runbook library. Customer-facing impact: 14 committed features delayed, including items promised to Hartfield Group and Meridian Capital.",
+    "outcome": "Feature freeze in effect from January 6, 2026. Five engineering squads working exclusively on: (1) database schema refactoring, (2) test coverage improvement (from 34% to 70% target), (3) incident tooling and runbook library, (4) Intercom-Salesforce sync cleanup, (5) infrastructure hardening. Customer-facing impact: 14 committed features delayed, including items promised to Hartfield Group and Meridian Capital.",
     "rationale": "The compound cost of tech debt had reached a tipping point. Incident rate was accelerating, not declining. Marcus Webb's argument: 'We are building on sand. Every feature we ship doubles the sand.' The decision is expected to reduce unplanned work to <15% of sprint capacity by end of Q1 2026.",
     "dissenting_views": [
       {
@@ -295,5 +295,92 @@
     "still_valid": false,
     "affects_workflows": ["wf-010", "wf-013", "wf-015"],
     "tags": ["operations", "commitment-tracking", "risk", "institutional-memory"]
+  },
+  {
+    "id": "dec-010",
+    "title": "Hired VP Engineering externally, partially displacing Yuki Tanaka's scope",
+    "made_by": ["actor-001"],
+    "made_at": "2023-02-15",
+    "summary": "Sarah Chen decided to hire a VP Engineering externally rather than promote Yuki Tanaka, as the company needed a VP-level hire to manage 3 engineering squads and own the technical org.",
+    "context": "By early 2023, Veridian had grown to 35 engineers and was adding a third squad. Marcus Webb was moving to CTO-level strategy and could no longer run the engineering org day-to-day. Yuki Tanaka was the obvious internal candidate — she had been Head of Engineering since 2019 and was universally respected. The decision was made without fully consulting Yuki or Marcus before the hire was in progress.",
+    "alternatives_considered": [
+      {
+        "name": "Promote Yuki Tanaka to VP Engineering",
+        "reason_rejected": "Sarah felt Yuki had not yet managed teams larger than 20 and that the company needed someone who had scaled an engineering org past 50 people. Yuki was considered an exceptional engineer and technical lead but an unproven manager at VP scale."
+      },
+      {
+        "name": "Promote James Okafor to Engineering Director",
+        "reason_rejected": "James was strong technically but expressed he wasn't seeking a management path — he preferred staying as a senior technical individual contributor."
+      }
+    ],
+    "outcome": "Oliver Mwangi hired April 2023 (actor-013). Yuki retained as Head of Engineering but scope narrowed to technical execution vs. org management — she now reports to Oliver rather than Marcus. Marcus strongly considers this a trust violation and has said so in 1:1s with Sarah. Yuki has remained professional but her engagement scores in anonymous surveys have declined. Still valid as of Q1 2026 but the dynamics it created are a retention risk.",
+    "rationale": "The company needed a VP-level hire with experience managing engineering orgs >30 people as Marcus moved to pure CTO-level focus. Oliver Mwangi had scaled Google UK's fintech engineering team from 25 to 80 people. The external hire was also intended to bring Google-scale engineering practices.",
+    "dissenting_views": [
+      {
+        "person": "actor-002",
+        "view": "Marcus Webb strongly favored promoting Yuki and considered the decision a trust violation. He argued that Yuki was fully capable of growing into the VP role with coaching, and that the external hire sent the wrong signal to the engineering team about career progression. He escalated his objection directly to Sarah but the decision stood."
+      }
+    ],
+    "still_valid": true,
+    "affects_workflows": ["wf-004", "wf-009"],
+    "tags": ["org-design", "engineering", "hiring", "culture", "retention-risk"]
+  },
+  {
+    "id": "dec-011",
+    "title": "Adopted HubSpot for Marketing while keeping Salesforce for Sales",
+    "made_by": ["actor-001", "actor-014"],
+    "made_at": "2022-09-15",
+    "summary": "When Sophie Laurent joined as Head of Marketing in September 2022, she brought a strong preference for HubSpot Marketing Hub. Rather than consolidate on Salesforce, Veridian built a bidirectional HubSpot-Salesforce sync.",
+    "context": "When Sophie was hired, she had run demand gen on HubSpot at her previous company and was unwilling to move to Salesforce Marketing Cloud, which she considered inferior for content-led demand gen. Sales was already committed to Salesforce. The path of least resistance was to run both and sync them.",
+    "alternatives_considered": [
+      {
+        "name": "Consolidate on Salesforce Marketing Cloud",
+        "reason_rejected": "Sophie Laurent rejected this — she had strong HubSpot skills and argued Salesforce Marketing Cloud had a worse UI and required more admin overhead."
+      },
+      {
+        "name": "Consolidate on HubSpot (Marketing + CRM)",
+        "reason_rejected": "Sales team was already using Salesforce with custom CPQ configuration. Migration would have been 3–4 months of work and high risk to pipeline tracking."
+      }
+    ],
+    "outcome": "Both tools deployed. The HubSpot-Salesforce sync has never worked cleanly — lead source data doesn't reliably flow to Salesforce, marketing-influenced pipeline is consistently understated, and paid channel ROI is effectively unmeasurable. Ravi Patel flagged attribution complexity when the decision was made. 18 months later, marketing ROI remains unmeasurable. Sophie has committed to fixing attribution by Q2 2026 (com-014), but the integration work sits with Ben Osei who hasn't scheduled it.",
+    "rationale": "The hire-with-their-stack approach was expedient — Sophie could start contributing immediately without learning a new platform. The longer-term integration cost was underestimated.",
+    "dissenting_views": [
+      {
+        "person": "actor-010",
+        "view": "Ravi Patel flagged attribution complexity at the time of the decision, noting that any multi-tool marketing stack requires perfect bidirectional sync to attribute pipeline correctly. His concern was noted but not acted on. He now has no visibility into which marketing campaigns are generating qualified pipeline."
+      }
+    ],
+    "still_valid": false,
+    "affects_workflows": ["wf-014", "wf-017"],
+    "tags": ["tooling", "marketing", "data-quality", "revisit"]
+  },
+  {
+    "id": "dec-012",
+    "title": "Created dedicated Head of Customer Onboarding role, partially reversing dec-003",
+    "made_by": ["actor-001", "actor-008"],
+    "made_at": "2024-06-01",
+    "summary": "After average onboarding time grew from 3 to 6 weeks following the dissolution of the Onboarding team in 2023, Sarah Chen and Fatima Al-Rashid approved the creation of a dedicated Head of Customer Onboarding role.",
+    "context": "By Q1 2024, data showed that onboarding time had doubled, onboarding NPS had fallen from +42 to +28, and early churn (0–90 day) had increased. The CSMs were visibly stretched. The Onboarding team dissolution in 2023 (dec-003) had been framed as a lean operational decision ahead of Series B — revisiting it publicly would require acknowledging a mistake.",
+    "alternatives_considered": [
+      {
+        "name": "Hire additional CSMs to absorb onboarding load",
+        "reason_rejected": "Onboarding required project management skills, not pure relationship management. More CSMs without a dedicated onboarding process would have the same problem."
+      },
+      {
+        "name": "Build self-serve onboarding tooling instead of hiring",
+        "reason_rejected": "The tooling investment was estimated at 3 months of Engineering time — not available given the tech debt backlog."
+      }
+    ],
+    "outcome": "Wei Zhang hired August 2024 as Head of Customer Onboarding (actor-019). By Q4 2024, onboarding time had recovered to 4 weeks (still longer than the 3-week baseline before dec-003, but significantly improved). The role creation was framed publicly as 'investing in customer experience' rather than as a reversal of dec-003, which Priya Sharma has noted with some frustration.",
+    "rationale": "The cost of extended onboarding (increased early churn, CSM time dilution, NPS decline) exceeded the cost of a dedicated hire. Fatima Al-Rashid, who joined post-dec-003, was the clearest-eyed about this analysis.",
+    "dissenting_views": [
+      {
+        "person": "actor-003",
+        "view": "Priya Sharma was supportive of the hire but felt the framing was dishonest — it acknowledged the mistake operationally without acknowledging it organizationally. She raised this with Fatima directly and was told the public framing was intentional."
+      }
+    ],
+    "still_valid": true,
+    "affects_workflows": ["wf-006", "wf-005"],
+    "tags": ["org-design", "customer-success", "onboarding", "revisit"]
   }
 ]

@@ -376,5 +376,212 @@
     "description": "The deferred commitment tracking system decision means quarterly planning commitments still go untracked after the meeting",
     "strength": "primary",
     "created_at": "2025-06-01"
+  },
+  {
+    "id": "rel-043",
+    "from_id": "actor-013",
+    "to_id": "actor-002",
+    "relationship_type": "REPORTS_TO",
+    "description": "Oliver Mwangi (VP Engineering) reports to Marcus Webb (CTO)",
+    "strength": "primary",
+    "created_at": "2023-04-01"
+  },
+  {
+    "id": "rel-044",
+    "from_id": "actor-005",
+    "to_id": "actor-013",
+    "relationship_type": "REPORTS_TO",
+    "description": "Yuki Tanaka now reports to Oliver Mwangi after dec-010 narrowed her scope",
+    "strength": "primary",
+    "created_at": "2023-04-01"
+  },
+  {
+    "id": "rel-045",
+    "from_id": "dec-010",
+    "to_id": "actor-005",
+    "relationship_type": "AFFECTS",
+    "description": "The external VP Engineering hire directly reduced Yuki Tanaka's organizational scope and changed her reporting line",
+    "strength": "primary",
+    "created_at": "2023-04-01"
+  },
+  {
+    "id": "rel-046",
+    "from_id": "actor-015",
+    "to_id": "wf-002",
+    "relationship_type": "TOUCHES",
+    "description": "Ben Osei owns the Intercom-Salesforce integration that causes the data quality issues in the CS ticket triage workflow",
+    "strength": "primary",
+    "created_at": "2023-07-15"
+  },
+  {
+    "id": "rel-047",
+    "from_id": "actor-016",
+    "to_id": "wf-016",
+    "relationship_type": "OWNS",
+    "description": "Imogen Walsh owns the Security and Compliance Review workflow",
+    "strength": "primary",
+    "created_at": "2024-02-01"
+  },
+  {
+    "id": "rel-048",
+    "from_id": "actor-017",
+    "to_id": "wf-014",
+    "relationship_type": "TOUCHES",
+    "description": "Carlos Mendez runs technical demos and security questionnaire responses as part of the new business sales process",
+    "strength": "primary",
+    "created_at": "2023-11-01"
+  },
+  {
+    "id": "rel-049",
+    "from_id": "actor-016",
+    "to_id": "wf-014",
+    "relationship_type": "TOUCHES",
+    "description": "Imogen Walsh is the legal reviewer in the New Business Sales Process — the #1 deal-slippage bottleneck",
+    "strength": "primary",
+    "created_at": "2024-02-01"
+  },
+  {
+    "id": "rel-050",
+    "from_id": "actor-014",
+    "to_id": "wf-017",
+    "relationship_type": "OWNS",
+    "description": "Sophie Laurent owns the Marketing Campaign Performance Review workflow",
+    "strength": "primary",
+    "created_at": "2022-09-01"
+  },
+  {
+    "id": "rel-051",
+    "from_id": "dec-011",
+    "to_id": "wf-017",
+    "relationship_type": "AFFECTS",
+    "description": "The split HubSpot/Salesforce stack decision (dec-011) is the root cause of the attribution gap that makes wf-017 painful",
+    "strength": "primary",
+    "created_at": "2022-09-15"
+  },
+  {
+    "id": "rel-052",
+    "from_id": "actor-019",
+    "to_id": "wf-006",
+    "relationship_type": "OWNS",
+    "description": "Wei Zhang owns the Customer Onboarding workflow — created specifically to fix the onboarding time regression from dec-003",
+    "strength": "primary",
+    "created_at": "2024-08-01"
+  },
+  {
+    "id": "rel-053",
+    "from_id": "dec-012",
+    "to_id": "actor-019",
+    "relationship_type": "AFFECTS",
+    "description": "The decision to create the Head of Customer Onboarding role (dec-012) directly created actor-019",
+    "strength": "primary",
+    "created_at": "2024-06-01"
+  },
+  {
+    "id": "rel-054",
+    "from_id": "dec-012",
+    "to_id": "dec-003",
+    "relationship_type": "SUPERSEDES",
+    "description": "dec-012 partially reverses dec-003 by re-creating dedicated onboarding ownership, though it was never framed as an admission of mistake",
+    "strength": "primary",
+    "created_at": "2024-06-01"
+  },
+  {
+    "id": "rel-055",
+    "from_id": "actor-020",
+    "to_id": "wf-001",
+    "relationship_type": "TOUCHES",
+    "description": "Kwame Asante is the practitioner who actually executes the 38-hour month-end close each month — Nadia owns it, Kwame does it",
+    "strength": "primary",
+    "created_at": "2023-03-15"
+  },
+  {
+    "id": "rel-056",
+    "from_id": "actor-020",
+    "to_id": "wf-008",
+    "relationship_type": "TOUCHES",
+    "description": "Kwame Asante handles day-to-day invoice reconciliation operations",
+    "strength": "primary",
+    "created_at": "2023-03-15"
+  },
+  {
+    "id": "rel-057",
+    "from_id": "actor-012",
+    "to_id": "wf-018",
+    "relationship_type": "OWNS",
+    "description": "Anya Volkov owns the New Employee Onboarding workflow",
+    "strength": "primary",
+    "created_at": "2022-07-01"
+  },
+  {
+    "id": "rel-058",
+    "from_id": "actor-013",
+    "to_id": "com-013",
+    "relationship_type": "COMMITTED_TO",
+    "description": "Oliver Mwangi made the runbook coverage commitment to Marcus Webb — a commitment that was subsequently broken",
+    "strength": "primary",
+    "created_at": "2026-01-06"
+  },
+  {
+    "id": "rel-059",
+    "from_id": "actor-014",
+    "to_id": "com-014",
+    "relationship_type": "COMMITTED_TO",
+    "description": "Sophie Laurent made the HubSpot-Salesforce attribution commitment to Sarah Chen",
+    "strength": "primary",
+    "created_at": "2026-03-05"
+  },
+  {
+    "id": "rel-060",
+    "from_id": "com-014",
+    "to_id": "actor-015",
+    "relationship_type": "DEPENDS_ON",
+    "description": "Sophie's attribution commitment (com-014) depends on Ben Osei doing the integration work — which is not yet scheduled",
+    "strength": "primary",
+    "created_at": "2026-03-05"
+  },
+  {
+    "id": "rel-061",
+    "from_id": "actor-018",
+    "to_id": "dec-002",
+    "relationship_type": "PARTICIPATED_IN",
+    "description": "Amara Diallo was the PM on the failed 2024 CS triage AI pilot — she carries institutional memory of what went wrong",
+    "strength": "primary",
+    "created_at": "2024-07-22"
+  },
+  {
+    "id": "rel-062",
+    "from_id": "actor-018",
+    "to_id": "wf-003",
+    "relationship_type": "TOUCHES",
+    "description": "Amara Diallo (Senior PM — Platform) contributes to the Product Spec to Linear Ticket workflow for Finance Workflow Engine roadmap items",
+    "strength": "secondary",
+    "created_at": "2022-05-01"
+  },
+  {
+    "id": "rel-063",
+    "from_id": "actor-013",
+    "to_id": "wf-009",
+    "relationship_type": "OWNS",
+    "description": "Oliver Mwangi now owns Engineering Sprint Planning as VP Engineering (previously Yuki's domain)",
+    "strength": "primary",
+    "created_at": "2023-04-01"
+  },
+  {
+    "id": "rel-064",
+    "from_id": "actor-016",
+    "to_id": "wf-013",
+    "relationship_type": "TOUCHES",
+    "description": "Imogen Walsh reviews contract terms in the Contract Renewal Management workflow when legal terms change",
+    "strength": "secondary",
+    "created_at": "2024-02-01"
+  },
+  {
+    "id": "rel-065",
+    "from_id": "wf-016",
+    "to_id": "wf-014",
+    "relationship_type": "PRODUCES",
+    "description": "The Security and Compliance Review workflow is a gate within the New Business Sales Process — a cleared review unblocks the deal",
+    "strength": "primary",
+    "created_at": "2024-02-01"
   }
 ]

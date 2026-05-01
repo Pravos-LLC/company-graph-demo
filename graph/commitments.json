@@ -88,7 +88,7 @@
     "evidence_source": "2025 Annual Planning session notes, direct conversation between Sarah Chen and Nadia Kovalchuk",
     "related_workflow": "wf-001",
     "priority": "critical",
-    "notes": "This is Nadia's top priority for Q1/Q2 2026. The model is being built in Google Sheets and will incorporate the AI pilot results from invoice reconciliation. Sarah needs it for investor conversations expected to start in May 2026."
+    "notes": "This is Nadia's top priority for Q1/Q2 2026. The model is being built in Google Sheets and will incorporate the AI pilot results from invoice reconciliation. Sarah needs it for investor conversations expected to start in May 2026. Kwame Asante (actor-020) is providing the underlying financial data."
   },
   {
     "id": "com-008",
@@ -101,7 +101,7 @@
     "evidence_source": "Board meeting minutes, February 2026",
     "related_workflow": "wf-012",
     "priority": "critical",
-    "notes": "Marcus Webb is working on this. The Q1 tech debt work is expected to provide the data points needed. Yuki Tanaka is contributing the engineering metrics section. First draft expected April 15, 2026."
+    "notes": "Marcus Webb is working on this. The Q1 tech debt work is expected to provide the data points needed. Yuki Tanaka is contributing the engineering metrics section. Oliver Mwangi is contributing the squad structure and capacity planning section. First draft expected April 15, 2026."
   },
   {
     "id": "com-009",
@@ -154,5 +154,31 @@
     "related_workflow": "wf-006",
     "priority": "high",
     "notes": "This is part of the Q1 2026 tech debt freeze scope and is directly related to the Hartfield customer commitment (com-001). James Okafor is leading. Timeline is Q2 2026 because Q1 is fully committed to foundational infrastructure work. This is a prerequisite for delivering SSO to Hartfield."
+  },
+  {
+    "id": "com-013",
+    "made_by": "actor-013",
+    "made_to": "actor-002",
+    "type": "internal",
+    "description": "Oliver Mwangi promised Marcus Webb that all 3 engineering squads would have full runbook coverage completed by end of Q1 2026, as part of Oliver's mandate to bring Google-scale engineering practices to Veridian.",
+    "due_date": "2026-03-31",
+    "status": "broken",
+    "evidence_source": "Engineering All-Hands notes, January 6, 2026; Slack message from Oliver Mwangi in #engineering-leadership, January 8, 2026",
+    "related_workflow": "wf-009",
+    "priority": "high",
+    "notes": "Only Squad 1 achieved full runbook coverage by the Q1 deadline. Squads 2 and 3 are at approximately 45% and 30% coverage respectively. Oliver flagged this to Marcus in the March 28 leadership sync — coverage was blocked by the depth of tech debt in the underlying systems, which made documenting runbooks harder than expected. Marcus accepted the explanation but noted it in the formal performance context for Oliver's annual review."
+  },
+  {
+    "id": "com-014",
+    "made_by": "actor-014",
+    "made_to": "actor-001",
+    "type": "internal",
+    "description": "Sophie Laurent committed to Sarah Chen that HubSpot-Salesforce attribution would be working end-to-end by end of Q2 2026, enabling marketing ROI measurement for the first time.",
+    "due_date": "2026-06-30",
+    "status": "open",
+    "evidence_source": "Q1 2026 Marketing review meeting notes, March 3, 2026; Slack message from Sophie Laurent to Sarah Chen, March 5, 2026",
+    "related_workflow": "wf-017",
+    "priority": "high",
+    "notes": "Known blocker: Ben Osei (actor-015) owns the Intercom-Salesforce integration and would be the primary engineer on the HubSpot-Salesforce sync work. This work is not currently in any sprint or on any roadmap. Sophie has not formally escalated the dependency to Oliver Mwangi or Fatima. If June 30 is to be achievable, the work needs to be scoped and scheduled in Q2 2026 immediately."
   }
 ]

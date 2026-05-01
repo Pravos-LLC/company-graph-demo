@@ -12,7 +12,7 @@ It is used as a demo/proof-of-concept by **Vibrana** (an AI transformation consu
 graph/               The actual data — 6 JSON files, one per entity type
 schema/              JSON Schema definitions + relationship rules
 scripts/             validate.sh, stats.sh, query.sh
-sentra/              Integration docs for connecting Sentra as live data source
+sentra/              Integration docs + sync script for connecting Sentra as live data source
 README.md            Client-facing overview + quickstart
 CLAUDE.md            This file — agent instructions
 ```
@@ -21,21 +21,21 @@ CLAUDE.md            This file — agent instructions
 
 | File | Contents | Count |
 |---|---|---|
-| `graph/actors.json` | People and teams: name, role, job family, tools, workflows, reporting line | 12 |
-| `graph/workflows.json` | Business processes: steps, tools, pain points, AI readiness scores | 15 |
-| `graph/decisions.json` | Key decisions: rationale, alternatives, dissenting views, validity | 9 |
-| `graph/commitments.json` | Open/fulfilled/broken promises: customer, internal, vendor | 12 |
+| `graph/actors.json` | People and teams: name, role, job family, tools, workflows, reporting line | 20 |
+| `graph/workflows.json` | Business processes: steps, tools, pain points, AI readiness scores | 18 |
+| `graph/decisions.json` | Key decisions: rationale, alternatives, dissenting views, validity | 12 |
+| `graph/commitments.json` | Open/fulfilled/broken promises: customer, internal, vendor | 14 |
 | `graph/value-objects.json` | Products, customers, data assets, capital: ownership, health | 9 |
-| `graph/relationships.json` | Explicit edges between entities: type, strength, date | 35 |
+| `graph/relationships.json` | Explicit edges between entities: type, strength, date | 65 |
 
 ### Entity ID Conventions
 
-- Actors: `actor-001` through `actor-012`
-- Workflows: `wf-001` through `wf-015`
-- Decisions: `dec-001` through `dec-009`
-- Commitments: `com-001` through `com-012`
+- Actors: `actor-001` through `actor-020`
+- Workflows: `wf-001` through `wf-018`
+- Decisions: `dec-001` through `dec-012`
+- Commitments: `com-001` through `com-014`
 - Value Objects: `vo-001` through `vo-009`
-- Relationships: `rel-001` through `rel-035`
+- Relationships: `rel-001` through `rel-065`
 
 ---
 
@@ -56,6 +56,8 @@ export ANTHROPIC_API_KEY=sk-ant-...
 ./scripts/query.sh "What are the top risks to our Series C story?"
 ./scripts/query.sh "What did Ravi Patel commit to, and are those commitments on track?"
 ./scripts/query.sh "Which of our decisions are now stale and should be revisited?"
+./scripts/query.sh "What is the engineering org situation and the Yuki/Oliver dynamic?"
+./scripts/query.sh "Why can't we measure marketing ROI?"
 ```
 
 The query script uses `claude-sonnet-4-6` with a system prompt that positions it as Veridian's Company Intelligence Assistant. Typical response time: 5–12 seconds.
@@ -109,7 +111,7 @@ All entities are stored as plain JSON arrays. To update an entity:
 ### Adding a New Entity
 
 1. Add a new JSON object to the appropriate file
-2. Use the next sequential ID (e.g., if the last actor is `actor-012`, use `actor-013`)
+2. Use the next sequential ID (e.g., if the last actor is `actor-020`, use `actor-021`)
 3. Follow the schema in `schema/entities.json` for required fields
 4. If the entity connects to others, add relationships to `graph/relationships.json`
 5. Validate
@@ -134,7 +136,7 @@ All entities are stored as plain JSON arrays. To update an entity:
 ```json
 // In graph/relationships.json, append:
 {
-  "id": "rel-036",
+  "id": "rel-066",
   "from_id": "actor-006",
   "to_id": "dec-007",
   "relationship_type": "DECIDED",
@@ -170,12 +172,24 @@ See `schema/relationships.json` for valid source/target combinations per type.
 
 ## Connecting Sentra as a Live Data Source
 
-The JSON files in `graph/` are manually maintained. For a production deployment, Sentra replaces them as the live data source:
+The JSON files in `graph/` are manually maintained. For a production deployment, Sentra augments them as a live data source:
 
-- Sentra auto-extracts commitments from Slack, email, and Salesforce
+- Sentra auto-extracts commitments from Slack, email, and calendar meetings
 - Sentra auto-extracts decisions from meeting transcripts
 - The manually curated rationale, pain points, and AI assessments remain human-authored
-- A sync script (`scripts/sync-from-sentra.sh`) regenerates the JSON files from Sentra's API
+- `sentra/sync.sh` pulls new entities from Sentra and merges them into the local graph
+
+### Testing the Sentra pipeline (no API key needed):
+```bash
+./sentra/sync.sh --mock
+```
+
+### Running a live sync:
+```bash
+export SENTRA_API_KEY="sk-sentra-..."
+export SENTRA_WORKSPACE_ID="veridian-workspace-001"
+./sentra/sync.sh
+```
 
 See `sentra/entity-mapping.md` for how Veridian's entities map to Sentra's model.
 See `sentra/integration-guide.md` for step-by-step setup instructions.
@@ -190,7 +204,7 @@ If you're using this repo in a client demo, here are the most compelling query s
 ```bash
 ./scripts/query.sh "Show me all broken or overdue commitments and what caused them"
 ```
-This surfaces com-001 (Hartfield SSO, overdue), com-004 (Product roadmap, broken), com-011 (Meridian CSV export, broken) and traces each to the decisions and workflows that created the gap.
+This surfaces com-001 (Hartfield SSO, overdue), com-004 (Product roadmap, broken), com-011 (Meridian CSV export, broken), com-013 (Oliver's runbook promise, broken) and traces each to the decisions and workflows that created the gap.
 
 **2. The Blocking Chain (shows graph relationships)**
 ```bash
@@ -202,7 +216,7 @@ This traces: sales commitment (Oct 2024) → Engineering concerns ignored → te
 ```bash
 ./scripts/query.sh "Which of our workflows are most ready for AI, and what's the estimated time savings?"
 ```
-Returns ranked list: wf-003 (spec-to-ticket, 3hrs/cycle), wf-001 (month-end close, 15-20hrs/month), wf-008 (invoice reconciliation) — with specific ROI context from the graph.
+Returns ranked list: wf-003 (spec-to-ticket, 3hrs/cycle), wf-001 (month-end close, 15-20hrs/month), wf-016 (security questionnaire, near-term answer library) — with specific ROI context from the graph.
 
 **4. The Decision Archaeology (shows the 'why')**
 ```bash
@@ -214,4 +228,10 @@ Returns the 2022 decision context, Ravi's dissent, and a note that the rationale
 ```bash
 ./scripts/query.sh "What are the top 3 risks to our Series C story right now?"
 ```
-Synthesizes: Hartfield at-risk account, tech debt narrative, and the self-serve competitive gap — all drawn from graph data.
+Synthesizes: Hartfield at-risk account (£8.2M ARR at stake at scale), tech debt narrative, and the self-serve competitive gap — all drawn from graph data.
+
+**6. The Org Tension Finder (shows people dynamics)**
+```bash
+./scripts/query.sh "What are the main sources of organizational tension in the engineering team?"
+```
+Surfaces: Yuki/Oliver scope displacement, Marcus's trust violation concern, Oliver's broken runbook commitment to Marcus.

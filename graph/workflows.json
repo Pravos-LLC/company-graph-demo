@@ -27,7 +27,7 @@
     ],
     "ai_readiness_score": 8,
     "ai_candidate": true,
-    "ai_opportunity_summary": "High-ROI candidate for AI-assisted reconciliation. The Xero→Salesforce matching step is pattern-heavy and rule-based — a good fit for automated anomaly detection and auto-categorization. Variance commentary drafting is a strong LLM use case (structured input → narrative output). Estimated time savings: 15–20 hours/month."
+    "ai_opportunity_summary": "High-ROI candidate for AI-assisted reconciliation. The Xero→Salesforce matching step is pattern-heavy and rule-based — a good fit for automated anomaly detection and auto-categorization. Variance commentary drafting is a strong LLM use case (structured input → narrative output). Estimated time savings: 15–20 hours/month. Kwame Asante (actor-020) is the primary beneficiary."
   },
   {
     "id": "wf-002",
@@ -53,12 +53,12 @@
       "Severity rubric lives in a Notion doc, not enforced",
       "Routing to correct CSM requires tribal knowledge of account ownership",
       "Duplicate tickets common — no deduplication step",
-      "Intercom→Salesforce sync has known data quality issues",
+      "Intercom→Salesforce sync has known data quality issues (Ben Osei owns the integration)",
       "A previous AI pilot for this workflow failed in 2024 — team is wary"
     ],
     "ai_readiness_score": 6,
     "ai_candidate": true,
-    "ai_opportunity_summary": "Moderate-difficulty AI use case. Classification and initial routing are automatable, but the failed 2024 AI pilot (wrong tool, low adoption) means change management is as important as the technology. Recommend starting with AI-suggested triage labels rather than fully automated routing. Data quality in Intercom must be cleaned up first."
+    "ai_opportunity_summary": "Moderate-difficulty AI use case. Classification and initial routing are automatable, but the failed 2024 AI pilot (wrong tool, low adoption) means change management is as important as the technology. Recommend starting with AI-suggested triage labels rather than fully automated routing. Data quality in Intercom must be cleaned up first — fix Ben Osei's integration issues before layering AI on top."
   },
   {
     "id": "wf-003",
@@ -152,7 +152,7 @@
   {
     "id": "wf-006",
     "name": "Customer Onboarding",
-    "owner": "actor-003",
+    "owner": "actor-019",
     "job_family": "Customer Success",
     "trigger": "Onboarding kickoff call completed",
     "output": "Customer live on Veridian platform with configured workflows, trained admin users, and signed off on success criteria",
@@ -172,13 +172,12 @@
       "SSO setup is manual and error-prone — no self-serve option (Hartfield commitment)",
       "Data migration requires Engineering involvement for non-standard formats",
       "Training content not updated since 2023; screenshots out of date",
-      "No clear owner for onboarding once moved from dedicated team back to CS (2023)",
       "Success criteria defined inconsistently across accounts",
-      "Average onboarding time has grown from 3 weeks to 6 weeks over 18 months"
+      "Average onboarding time was 6 weeks before Wei Zhang was hired; now recovering to 4 weeks"
     ],
     "ai_readiness_score": 5,
     "ai_candidate": true,
-    "ai_opportunity_summary": "Medium-term AI opportunity. Near-term wins: auto-generate onboarding plan from customer profile, AI-powered chatbot for end-user training questions. Longer term: intelligent workflow migration tool that maps customer's existing processes to Veridian templates. Blocked by data quality and SSO infrastructure gaps."
+    "ai_opportunity_summary": "Medium-term AI opportunity. Near-term wins: auto-generate onboarding plan from customer profile, AI-powered chatbot for end-user training questions. Longer term: intelligent workflow migration tool that maps customer's existing processes to Veridian templates. Blocked by data quality and SSO infrastructure gaps. Wei Zhang's dedicated ownership (actor-019) is a prerequisite for any AI augmentation to land."
   },
   {
     "id": "wf-007",
@@ -201,7 +200,7 @@
     "avg_time_hours": 4.5,
     "pain_points": [
       "Runbook library is incomplete — 40% of incident types lack documented procedures",
-      "On-call rotation has been 3 engineers covering a 22-person team",
+      "On-call rotation has been 3 engineers covering a 45-person engineering team",
       "Root cause analysis often identifies same issues recurring — no feedback loop to prevent",
       "Postmortem quality varies — no enforcement",
       "Customer-facing data issues discovered by CSMs before Engineering (embarrassing)"
@@ -237,12 +236,12 @@
     ],
     "ai_readiness_score": 8,
     "ai_candidate": true,
-    "ai_opportunity_summary": "High-value AI target. Automated matching between Xero and Salesforce records, AI-drafted chaser emails with appropriate tone calibration by account tier, and anomaly flagging on contract vs. invoice discrepancies. Near-term win available with minimal infrastructure change — could be a Veridian's first live AI workflow."
+    "ai_opportunity_summary": "High-value AI target. Automated matching between Xero and Salesforce records, AI-drafted chaser emails with appropriate tone calibration by account tier, and anomaly flagging on contract vs. invoice discrepancies. Near-term win available with minimal infrastructure change — could be Veridian's first live AI workflow. Kwame Asante (actor-020) is the daily operator."
   },
   {
     "id": "wf-009",
     "name": "Engineering Sprint Planning",
-    "owner": "actor-005",
+    "owner": "actor-013",
     "job_family": "Engineering",
     "trigger": "Bi-weekly, Monday of sprint start",
     "output": "Committed sprint backlog with accepted tickets, capacity plan, and team assignments",
@@ -262,11 +261,11 @@
       "Capacity calculation is manual (spreadsheet) and error-prone",
       "Context from previous sprint retrospective not systematically surfaced",
       "Tech debt tickets regularly deprioritized in favor of feature work (until Q1 2026 freeze)",
-      "Remote team timezone spread (London, Tokyo, Nairobi, Bangalore) makes synchronous planning hard"
+      "Remote team timezone spread (London, Tokyo, Nairobi, Bangalore, Accra, Madrid) makes synchronous planning hard with 45 engineers across 5 squads"
     ],
     "ai_readiness_score": 6,
     "ai_candidate": true,
-    "ai_opportunity_summary": "AI can assist with capacity planning automation and ticket quality checks (flag tickets missing acceptance criteria). Sprint retrospective summarization and carry-forward context are strong LLM use cases. Does not require major infrastructure changes."
+    "ai_opportunity_summary": "AI can assist with capacity planning automation and ticket quality checks (flag tickets missing acceptance criteria). Sprint retrospective summarization and carry-forward context are strong LLM use cases. Does not require major infrastructure changes. Ownership of this workflow moved from Yuki to Oliver (actor-013) as part of the VP Engineering hire."
   },
   {
     "id": "wf-010",
@@ -370,7 +369,7 @@
       "CSM reviews account health: usage, NPS, open commitments",
       "CSM prepares renewal business case (value delivered, roadmap items)",
       "Commercial negotiation with customer",
-      "Legal review if terms change",
+      "Legal review if terms change (Imogen Walsh, actor-016)",
       "DocuSign sent and signed",
       "Updated contract uploaded to Salesforce",
       "Finance notified for revenue recognition update"
@@ -381,7 +380,7 @@
       "No structured view of open commitments per account — CSM must manually piece together",
       "Usage data in Looker not always current at time of renewal prep",
       "Renewal business case written from scratch each time — no template or prior version",
-      "Legal review turnaround time unpredictable (ranges from 2 days to 3 weeks)",
+      "Legal review turnaround time unpredictable (2 days to 3 weeks — Imogen Walsh is the bottleneck)",
       "Commitment status for renewal accounts surfaced too late — some commitments discovered broken at renewal call"
     ],
     "ai_readiness_score": 7,
@@ -398,9 +397,9 @@
     "steps": [
       "SDR qualifies inbound lead or outbound prospect",
       "Discovery call: pain, process, budget, authority, timeline",
-      "Technical demo (AE + Solutions Engineer)",
+      "Technical demo (AE + Carlos Mendez, Solutions Engineering)",
       "Proposal generated from Salesforce CPQ",
-      "Security review if customer requires it",
+      "Security review if customer requires it (Carlos + Imogen Walsh)",
       "Negotiation and legal review",
       "DocuSign sent; contract signed",
       "Opportunity marked Closed Won; handoff to CS initiated"
@@ -410,13 +409,13 @@
     "pain_points": [
       "No formal process for capturing commitments made during sales — verbal agreements not logged",
       "Proposal generation from CPQ is slow — custom pricing common for enterprise deals",
-      "Security review process not standardized — each customer has different questionnaire",
-      "Win/loss analysis not systematically conducted",
+      "Security review not standardized — Carlos answers same questions from scratch each time, no answer library",
+      "Legal review turnaround (Imogen Walsh) is the #1 deal-slippage driver according to Ravi Patel",
       "AEs make product commitments to close deals that Engineering doesn't know about"
     ],
     "ai_readiness_score": 6,
     "ai_candidate": true,
-    "ai_opportunity_summary": "AI can assist with proposal personalization, security questionnaire auto-completion, and — most valuably — commitment extraction from sales call transcripts. The last item directly addresses Veridian's core institutional memory gap around customer commitments."
+    "ai_opportunity_summary": "AI can assist with proposal personalization, security questionnaire auto-completion, and — most valuably — commitment extraction from sales call transcripts. The security questionnaire use case is immediately actionable: Carlos Mendez has enough institutional knowledge to seed an answer library that an LLM can query and draft from."
   },
   {
     "id": "wf-015",
@@ -446,5 +445,95 @@
     "ai_readiness_score": 4,
     "ai_candidate": false,
     "ai_opportunity_summary": "The planning workflow itself is a human coordination problem, not an automation target. However, this is exactly the workflow that would benefit most from a Company Graph: surfacing prior commitments, tracking follow-through, and connecting cross-functional dependencies. The graph is the solution here, not an AI model."
+  },
+  {
+    "id": "wf-016",
+    "name": "Security & Compliance Review",
+    "owner": "actor-016",
+    "job_family": "Legal",
+    "trigger": "Enterprise deal >£50K OR customer-initiated security questionnaire received",
+    "output": "Completed security questionnaire; signed DPA/addendum if required; deal cleared for legal execution",
+    "steps": [
+      "Sales (Carlos Mendez) flags security review requirement in Salesforce",
+      "Imogen Walsh assigned as legal reviewer",
+      "Customer security questionnaire received (usually PDF or web form)",
+      "Carlos and Imogen work through questionnaire collaboratively",
+      "Engineering consulted for technical architecture questions (typically James Okafor or Dev Anand)",
+      "Legal addendum drafted if terms require it",
+      "Completed questionnaire returned to customer",
+      "Deal cleared to proceed to commercial negotiation"
+    ],
+    "tools_used": ["Notion", "DocuSign", "Google Workspace", "Slack"],
+    "avg_time_hours": 18,
+    "pain_points": [
+      "Each customer has a different questionnaire format — no standardization",
+      "No answer library: the same questions (data residency, encryption, access controls, SOC 2) are answered from scratch each time",
+      "Legal turnaround is the #1 reason deals slip according to Ravi Patel — ranges 2 days to 3 weeks",
+      "Engineering pulled in ad hoc with no scheduling — disrupts sprint work",
+      "No audit trail of previous answers — Carlos and Imogen hold institutional knowledge in their heads"
+    ],
+    "ai_readiness_score": 7,
+    "ai_candidate": true,
+    "ai_opportunity_summary": "High-value AI use case with a clear starting point: build a security answer library from Veridian's previous questionnaire responses (Carlos Mendez has most of these), then use an LLM to draft responses to new questionnaires by matching questions to the library. Carlos estimates 60%+ of questions across customers are identical or near-identical. Reduces Imogen's review time significantly and removes Engineering from the critical path for most reviews."
+  },
+  {
+    "id": "wf-017",
+    "name": "Marketing Campaign Performance Review",
+    "owner": "actor-014",
+    "job_family": "Marketing",
+    "trigger": "Monthly, first Monday",
+    "output": "Campaign performance summary; channel ROI analysis; recommendations for next month budget allocation",
+    "steps": [
+      "Sophie pulls campaign data from HubSpot Marketing Hub",
+      "Sophie pulls pipeline and closed-won data from Salesforce",
+      "Attempt to join HubSpot lead source data with Salesforce opportunity data",
+      "Pull paid channel spend data (LinkedIn, Google) from respective ad platforms",
+      "Pull content analytics from HubSpot and Notion",
+      "Manually assemble in Google Sheets",
+      "Write narrative commentary",
+      "Present to Sarah and Fatima in monthly marketing review"
+    ],
+    "tools_used": ["HubSpot Marketing", "Salesforce", "Google Sheets", "Slack", "Canva"],
+    "avg_time_hours": 8,
+    "pain_points": [
+      "HubSpot and Salesforce are not properly synced — lead source data in HubSpot doesn't reliably join to closed deals in Salesforce",
+      "No attribution from campaign to closed deal — paid channel ROI is effectively unmeasurable",
+      "Content performance metrics scattered across HubSpot, Notion, and LinkedIn native analytics",
+      "Marketing-sourced pipeline is consistently understated because Sales reps don't update lead source in Salesforce",
+      "Report is assembled manually every month with no template memory — same structure built from scratch"
+    ],
+    "ai_readiness_score": 6,
+    "ai_candidate": true,
+    "ai_opportunity_summary": "The attribution gap is a data infrastructure problem before it's an AI problem — the HubSpot-Salesforce sync must be fixed first (Ben Osei's work, tracked in com-014). Once data quality improves, AI can build a multi-touch attribution model and auto-generate the monthly performance narrative from structured inputs. Near-term win: AI-assisted narrative drafting from whatever data currently exists, even if attribution is incomplete."
+  },
+  {
+    "id": "wf-018",
+    "name": "New Employee Onboarding",
+    "owner": "actor-012",
+    "job_family": "People Operations",
+    "trigger": "New hire start date minus 5 business days",
+    "output": "New employee provisioned, introduced to team, assigned buddy, and working through role-specific onboarding plan by end of week 1",
+    "steps": [
+      "Anya Volkov notified of confirmed start date from Greenhouse",
+      "IT provisioning ticket created in Rippling (laptop, accounts, Slack)",
+      "Welcome email sent with first-week schedule",
+      "Buddy assigned (ad hoc, no matching system)",
+      "New hire completes Rippling onboarding checklist",
+      "HR orientation call (Anya or People Ops team member)",
+      "Manager check-in scheduled for end of week 1",
+      "30-day and 90-day review checkpoints created in Notion"
+    ],
+    "tools_used": ["Rippling", "Notion", "Slack", "Google Workspace", "Greenhouse"],
+    "avg_time_hours": 12,
+    "pain_points": [
+      "Onboarding documentation last fully updated in 2024; role-specific sections missing for most job families added since then",
+      "No role-specific onboarding paths — engineer onboarding is identical to CSM onboarding",
+      "Buddy assignment is ad hoc — Anya picks someone she knows is a good culture fit, no system",
+      "No measurement of new hire ramp time — unclear when someone is truly 'productive'",
+      "At 150 people and growing, ad hoc onboarding is creating inconsistent new hire experiences"
+    ],
+    "ai_readiness_score": 5,
+    "ai_candidate": true,
+    "ai_opportunity_summary": "Medium-term AI opportunity. Near-term: use AI to generate role-specific onboarding paths from existing job family information in Rippling and Notion. Buddy matching could be improved with a simple algorithm (team overlap, tenure, interests). Longer term: AI-personalized ramp plan that adapts based on early feedback. The prerequisite is updating the base onboarding documentation first — AI cannot personalize content that doesn't exist."
   }
 ]

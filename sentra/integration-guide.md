@@ -1,293 +1,271 @@
 # Sentra Integration Guide
 
-## Replacing Manual JSON Files with a Live Data Source
+## Connecting the Veridian Company Graph to Sentra's Live Data Layer
 
-This guide covers the steps to connect Sentra as the live data layer for the Veridian Company Graph, transitioning from manually maintained JSON files to a continuously updated organizational memory system.
+This guide covers how to connect Sentra as the observational data source for the Veridian Company Graph. After setup, Sentra will automatically surface new decisions and commitments from your team's communication tools, which the sync pipeline (`sentra/sync.sh`) can merge into the graph.
 
-**Estimated time to complete Phases 1–3:** 2–3 days (with IT access)
-**Prerequisites:** Sentra account (Enterprise tier), admin access to Google Workspace, Slack, Linear, Salesforce
+**Sentra product used in this guide:** Team plan ($16/seat/month as of 2026)
+**Connectors covered:** Slack (required), Google Workspace (recommended), Linear (recommended)
+**Estimated time from sign-up to first useful data:** ~2 weeks (Sentra needs time to learn organizational patterns)
+**Prerequisites:** Admin access to Slack workspace, Google Workspace admin or delegated access
 
 ---
 
 ## Overview
 
-The integration has four phases:
+The integration has five phases:
 
 ```
-Phase 1: Sentra Account Setup + Initial Configuration
-Phase 2: Connector Configuration (Slack, Google Workspace, Linear, Salesforce)
-Phase 3: Entity Schema Configuration + Initial Seeding
-Phase 4: API Export Pipeline + Local Auto-Sync
+Phase 1: Sentra account setup
+Phase 2: Connect connectors (Slack, Google Workspace, Linear)
+Phase 3: Configure entity extraction settings
+Phase 4: Test with mock data, then run first live sync
+Phase 5: Automate with LaunchAgent or cron
 ```
 
-After Phase 4, the JSON files in `graph/` become read replicas — Sentra is the source of truth, and the files are regenerated on a schedule.
+After Phase 4, new decisions and commitments that Sentra detects are merged into `graph/decisions.json` and `graph/commitments.json` on each sync run. Human review is required before auto-imported entities go into production use.
 
 ---
 
 ## Phase 1: Sentra Account Setup
 
-### 1.1 Create a Sentra Organization
+### 1.1 Create a Workspace
 
-1. Go to [sentra.ai](https://sentra.ai) and sign up for an Enterprise account.
-2. Name the organization **Veridian** — this becomes the namespace for all entities.
-3. Create an Admin user with your corporate email.
-4. Invite `sarah.chen@veridian.com` (CEO) and `fatima.al-rashid@veridian.com` (COO) as Owners — they need visibility into the full graph.
+1. Go to [sentra.app](https://sentra.app) and sign up. If you want a walkthrough of the initial configuration, book a demo from the homepage — the Sentra team configures the workspace entity extraction settings during onboarding.
+2. Create a workspace named **Veridian** (or your company name for real deployments).
+3. Set your organization size to **100–250 employees** — this affects extraction sensitivity defaults.
+4. Invite the following as workspace Owners: `sarah.chen@veridian.com` (CEO), `fatima.al-rashid@veridian.com` (COO). Owners see the full graph including confidence scores and review queues.
 
 ### 1.2 Generate an API Key
 
 1. Navigate to **Settings > API > Create API Key**.
-2. Name it `company-graph-sync`.
-3. Scope it to `entities:read`, `entities:write`, `connectors:read`.
-4. Store the key securely: add it to your password manager and to Veridian's 1Password vault under `Engineering > Sentra API Key`.
-5. Set it as an environment variable for local development:
-   ```bash
-   export SENTRA_API_KEY="sk-sentra-..."
-   ```
+2. Name the key `company-graph-sync`.
+3. Permissions needed: `entities:read`, `entities:write`.
+4. Copy the key and store it in your team's password manager (1Password, Bitwarden, etc.).
+5. Set environment variables for local use:
 
-### 1.3 Configure Organizational Metadata
+```bash
+export SENTRA_API_KEY="sk-sentra-..."
+export SENTRA_WORKSPACE_ID="veridian-workspace-001"
+```
 
-In Sentra's **Organization Settings**:
-- **Industry:** Financial Services Software (SaaS)
-- **Size:** 51–100 employees
+Add these to `~/.zshrc` or `~/.bashrc` for persistence, or use a `.env` file in the repo root (ensure `.env` is in `.gitignore`).
+
+### 1.3 Set Organizational Context
+
+In **Settings > Workspace**:
+- **Industry:** B2B SaaS / Financial Software
 - **Primary language:** English
 - **Timezone:** Europe/London
 - **Fiscal year start:** January
 
+This helps Sentra calibrate extraction models to your domain. Finance-specific terminology (reconciliation, NRR, ARR, churn, CSM) will be recognized more reliably after workspace context is set.
+
 ---
 
-## Phase 2: Connector Configuration
+## Phase 2: Connect Connectors
 
-Connectors are the integrations that allow Sentra to observe organizational activity. Configure them in order of priority.
+Connect in order of priority. Slack provides the most signal and should go first.
 
-### 2.1 Slack Connector
+### 2.1 Slack (Required)
 
-Slack provides the highest signal for informal commitments, decisions-in-progress, and communication patterns.
+Slack is Sentra's primary source for informal commitments, in-progress decisions, and communication patterns.
 
 1. In Sentra: **Connectors > Add Connector > Slack**.
-2. Authorize with a Slack Admin account (requires `channels:read`, `channels:history`, `users:read`).
-3. Configure channel scope:
-   - **Include:** All public channels, DMs involving leadership team (opt-in required per user)
-   - **Exclude:** `#random`, `#social`, `#off-topic`
-4. Set the **commitment detection sensitivity** to Medium — high sensitivity generates too many false positives.
-5. Enable **decision extraction** from Slack threads that contain phrases like "we've decided", "going with", "agreed to".
+2. Click **Authorize** — this opens the Slack OAuth flow. You need to be a Slack Workspace Admin or have an Admin authorize it.
+3. Required Slack scopes: `channels:read`, `channels:history`, `users:read`, `conversations:history`.
+4. In the connector settings:
+   - **Channel scope:** Include all public channels. Exclude: `#random`, `#social`, `#watercooler`, `#job-board`.
+   - **Commitment detection sensitivity:** Set to **Medium**. High generates too many false positives from conversational language ("I'll look into that") — you'll spend more time dismissing bad extractions than reviewing good ones.
+   - **Decision extraction keywords:** `we've decided`, `going with`, `agreed to`, `the plan is`, `moving forward with`, `confirmed:`.
 
-**Expected outcomes after 7 days:**
-- Sentra will surface 15–40 informal commitments per week from Slack
-- ~30% will be genuine commitments worth tracking; the rest are conversational and should be dismissed
-- Assign a human reviewer (recommend Fatima Al-Rashid's EA or ops coordinator) to triage weekly
+5. Wait 24–48 hours. Sentra will backfill up to 90 days of channel history on the first run.
 
-### 2.2 Google Workspace Connector
+**What to expect:** After the first week, Sentra surfaces 10–30 potential commitments per week. Roughly 25–35% will be genuine commitments worth tracking. The rest are conversational ("can you check that?", "I'll try to make it") and should be dismissed. Assign Fatima Al-Rashid or her EA as the weekly reviewer.
 
-Google Workspace provides meeting transcripts (if enabled), document decisions, and org chart data.
+**Veridian-specific channels to prioritize:**
+- `#leadership` — decisions and cross-functional commitments
+- `#cs-leadership` — customer commitments surface here
+- `#engineering-leadership` — internal engineering commitments
+- `#product` — commitment language around roadmap and delivery dates
+- `#sales` — customer commitment risk; AEs make promises here
+
+### 2.2 Google Workspace (Recommended)
+
+Google Workspace provides meeting context (if transcription is enabled), org chart data, and document-based decisions.
 
 1. In Sentra: **Connectors > Add Connector > Google Workspace**.
-2. Authorize with a Google Workspace Admin account. Required scopes:
-   - `admin.directory.user.readonly` (for org chart)
-   - `drive.readonly` (for document scanning — limit to specific shared drives)
-   - `calendar.readonly` (for meeting metadata)
+2. Authorize with a Google Workspace Admin account. Required OAuth scopes:
+   - `admin.directory.user.readonly` — for org chart and actor data
+   - `drive.readonly` — document scanning (scope to shared drives only, not personal My Drive)
+   - `calendar.readonly` — meeting metadata (titles, attendees, frequency)
 3. Configure document scope:
-   - **Include:** Shared drives: `Strategy`, `Customer Success`, `Product`, `Engineering Docs`
-   - **Exclude:** Personal My Drive folders
-4. Enable **meeting transcript scanning** if Veridian uses Google Meet with transcription enabled.
-5. Set the **document scan depth** to include documents modified in the last 24 months (older documents may generate noise).
+   - **Include shared drives:** Strategy, Customer Success, Engineering Docs, Finance
+   - **Exclude:** Personal My Drive folders, Archive drives
+4. **Meeting transcript scanning:** This requires Google Meet with transcription enabled (Workspace Business Plus or Enterprise tier). If enabled, Sentra can extract decisions from meeting transcripts — the highest-quality extraction source. If Zoom is used instead, there is no native Zoom connector on the Team plan; consider upgrading or exporting Zoom transcripts manually.
 
-**Meeting transcription note:** Google Meet transcripts require the Workspace Business Plus or Enterprise tier and must have transcription enabled per meeting. If Zoom is used instead, configure the Zoom connector following the same steps.
+**Note on transcription:** Many teams don't enable transcription by default due to privacy concerns. If you enable it, communicate clearly to the team what data Sentra is collecting and how it will be used.
 
-### 2.3 Linear Connector
+### 2.3 Linear (Recommended for Engineering Commitments)
 
-Linear provides decision trails from ticket activity, project creation, and sprint planning.
+Linear provides engineering commitments (delivery dates in ticket descriptions), decision trails from ticket discussions, and workflow activity evidence.
 
 1. In Sentra: **Connectors > Add Connector > Linear**.
-2. Generate a Linear API key (read-only) from **Linear > Settings > API > Personal API Keys**.
+2. Generate a Linear API key (read-only) from **Linear > Settings > API > Personal API Keys**. Use a service account if available.
 3. In Sentra, enter the API key and authorize the `veridian` workspace.
-4. Configure entity extraction:
-   - **Decisions:** Extract from ticket comments containing "decision:", "decided:", "rationale:"
-   - **Commitments:** Extract from ticket descriptions containing delivery dates and assignees
-   - **Value Objects:** Extract project names and labels as potential value objects
-5. Enable **workflow correlation**: Sentra will attempt to link Linear project activity to Workflow entities.
+4. Configure extraction:
+   - **Commitments:** Extract from ticket `due_date` fields, descriptions containing "will be done by", "target:", "committed to"
+   - **Decisions:** Extract from ticket comments with explicit decision language
 
-**Note on the tech debt freeze:** Linear projects created in January 2026 (`FWE Test Coverage`, `Admin SSO Self-Serve`) should be manually tagged in Sentra as related to `dec-008` (tech debt freeze decision). This cross-reference is too important to leave to automated inference.
+**Important manual tag:** After connecting, manually tag the following Linear projects in Sentra to link them to existing graph decisions:
+- `FWE Test Coverage` → `dec-008` (tech debt freeze)
+- `Admin SSO Self-Serve` → `dec-008` and `com-001` (Hartfield SSO commitment)
 
-### 2.4 Salesforce Connector
+These cross-references are too important to leave to automated inference.
 
-Salesforce provides the ground truth for customer commitments — the most critical and most fragile class of commitment for Veridian.
+### Connectors NOT Included in Team Plan
 
-1. In Sentra: **Connectors > Add Connector > Salesforce**.
-2. Authorize with a Salesforce Admin account. Sentra requires a Connected App with:
-   - `api` scope
-   - `refresh_token` scope
-   - Read access to: Opportunity, Account, Contact, Task, Note objects
-3. Configure commitment extraction:
-   - Scan **Opportunity Notes** for commitment language
-   - Scan **Tasks** with subject containing "committed", "promised", "deliverable"
-   - Scan **Custom Fields** — check if Ravi Patel's team uses any custom commitment tracking fields
-4. Map Salesforce Accounts to Veridian ValueObject entities:
-   - Hartfield Group → `vo-002`
-   - Meridian Capital → `vo-003`
-   - Solaris Financial → `vo-004`
-5. Set Salesforce as **authoritative** for customer commitment status — Sentra should not override Salesforce data with Slack inferences for customer-type commitments.
+The following connectors require Sentra's Business plan or above:
+- **Salesforce** — critical for customer commitment extraction; plan upgrade required
+- **GitHub** — useful for engineering commitment tracking
+- **Outlook / Microsoft 365** — if your team uses Microsoft instead of Google
 
-**Critical note:** The Hartfield SSO commitment (com-001) is documented in Salesforce opportunity `opp-HG-2024-RNW`. After configuring the connector, manually verify that Sentra has detected and linked this commitment. If not, create it manually using the Sentra UI and link it to the Hartfield account.
+For customer commitments specifically, until the Salesforce connector is available, manually seed high-priority commitments from Salesforce opportunity notes into `graph/commitments.json`.
 
 ---
 
-## Phase 3: Entity Schema Configuration + Initial Seeding
+## Phase 3: Configure Entity Extraction Settings
 
-### 3.1 Import the Veridian Schema
+After connectors are running for 3–5 days and Sentra has indexed initial data:
 
-Sentra supports custom entity schemas via its configuration API. Import the Veridian schema:
+### 3.1 Tune Commitment Detection
 
-```bash
-# Install the Sentra CLI
-npm install -g @sentra/cli
+In **Settings > Entity Extraction > Commitments**:
 
-# Authenticate
-sentra auth login --api-key $SENTRA_API_KEY
+**Add to the extraction vocabulary:**
+- `by end of Q`, `by next quarter`, `before renewal`, `before the board`, `before Hartfield`
+- Finance-specific terms: `reconciliation`, `close`, `board pack`, `ARR model`
+- Customer names: `Hartfield`, `Meridian`, `Solaris`
 
-# Import entity schemas
-sentra schema import --file schema/entities.json --org veridian
+**Add to the false-positive blocklist** (these phrases generate too many low-quality extractions):
+- `can you`, `would you mind`, `whenever you get a chance`, `might be able to`, `let's see if`
 
-# Import relationship rules
-sentra schema import --file schema/relationships.json --org veridian --type relationships
-```
+### 3.2 Tune Decision Detection
 
-If the Sentra CLI doesn't support direct JSON Schema import, use the API:
+In **Settings > Entity Extraction > Decisions**:
 
-```bash
-curl -X POST "https://api.sentra.ai/v1/orgs/veridian/schema" \
-  -H "Authorization: Bearer $SENTRA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d @schema/entities.json
-```
+Add decision-language patterns specific to Veridian's culture:
+- `locking in`, `we're going with`, `final call`, `agreed offline`, `Sarah's call`, `Marcus's call`
 
-### 3.2 Seed Initial Entities
+### 3.3 Set Actor-to-Graph Mappings
 
-Import the manually curated graph data as the starting state:
+Map Sentra's actor identities to Veridian's graph actor IDs. This allows the sync script to replace name strings with `actor-NNN` IDs automatically.
 
-```bash
-# Import all entity types
-for entity_file in graph/actors.json graph/workflows.json graph/decisions.json \
-  graph/commitments.json graph/value-objects.json; do
-  entity_type=$(basename "$entity_file" .json)
-  echo "Importing $entity_type..."
-  sentra entities import \
-    --file "$entity_file" \
-    --type "$entity_type" \
-    --org veridian \
-    --conflict-strategy merge
-done
+In Sentra: **Actors > [each actor] > Graph ID**, enter:
+- Sarah Chen → `actor-001`
+- Marcus Webb → `actor-002`
+- Priya Sharma → `actor-003`
+- (continue for all 20 actors)
 
-# Import relationships
-sentra relationships import \
-  --file graph/relationships.json \
-  --org veridian
-```
-
-### 3.3 Set Entity Provenance
-
-For each manually seeded entity, set the `source` field to `manual` so the sync pipeline knows not to overwrite human-curated data:
-
-```bash
-sentra entities update-all \
-  --org veridian \
-  --filter 'source == null' \
-  --set 'source=manual,confidence=1.0'
-```
-
-Sentra auto-extracted entities will have `source=extracted` and a confidence score <1.0.
-
-### 3.4 Map Connectors to Entities
-
-After seeding, link connector data sources to entity types:
-- Slack → Commitments (informal), Decisions (informal)
-- Google Workspace → Decisions, Actors (org chart)
-- Linear → Workflows, Commitments (delivery dates)
-- Salesforce → Commitments (customer), ValueObjects (accounts)
-
-In the Sentra UI: **Entity Settings > Data Sources > Map Sources to Entity Types**.
+Once mapped, auto-extracted entities will use actor IDs in `made_by` and `made_to` fields.
 
 ---
 
-## Phase 4: API Export Pipeline + Local Auto-Sync
+## Phase 4: Test with Mock Data, Then Run First Live Sync
 
-### 4.1 Sentra Export API Overview
+### 4.1 Test the Pipeline with Mock Data
 
-Sentra's export API returns entities in a format that can be transformed to the Veridian graph schema. The base endpoint:
-
-```
-GET https://api.sentra.ai/v1/orgs/veridian/entities?type={type}&format=json
-```
-
-### 4.2 Create the Sync Script
-
-Create `scripts/sync-from-sentra.sh`:
+Before running against the live Sentra API, verify the sync script works correctly with the mock responses:
 
 ```bash
-#!/usr/bin/env bash
-# sync-from-sentra.sh — Pull latest entity data from Sentra and update graph/
-# Run manually or via LaunchAgent (see Phase 4.4)
+cd /path/to/company-graph-demo
 
-set -euo pipefail
+# Dry run first — shows what would be written without writing it
+./sentra/sync.sh --mock --dry-run
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-GRAPH_DIR="$REPO_ROOT/graph"
-API_BASE="https://api.sentra.ai/v1/orgs/veridian"
-SENTRA_API_KEY="${SENTRA_API_KEY:?Error: SENTRA_API_KEY not set}"
-
-echo "Syncing from Sentra at $(date)..."
-
-# Pull each entity type
-for entity_type in actors workflows decisions commitments value-objects relationships; do
-  output_file="$GRAPH_DIR/${entity_type}.json"
-  
-  response=$(curl -sf \
-    -H "Authorization: Bearer $SENTRA_API_KEY" \
-    "$API_BASE/entities?type=$entity_type&format=veridian-schema" 2>/dev/null)
-  
-  if [ $? -eq 0 ] && [ -n "$response" ]; then
-    # Validate that it's valid JSON before overwriting
-    if echo "$response" | jq empty 2>/dev/null; then
-      echo "$response" > "$output_file"
-      echo "  Updated graph/$entity_type.json"
-    else
-      echo "  WARNING: Invalid JSON from Sentra for $entity_type — skipping"
-    fi
-  else
-    echo "  WARNING: Could not fetch $entity_type from Sentra — skipping"
-  fi
-done
-
-echo "Running validation..."
-bash "$REPO_ROOT/scripts/validate.sh"
-
-echo "Sync complete at $(date)"
+# Then run for real with mock data
+./sentra/sync.sh --mock
 ```
 
-**Note:** The `?format=veridian-schema` query parameter assumes Sentra supports custom export schemas mapped to the Veridian entity structure (configured in Phase 3.1). If not, you'll need a transformation layer — see Section 4.3.
+Expected output:
+```
+[09:00:01] Starting Veridian Company Graph sync
+[09:00:01] Mode: MOCK
+[09:00:01] Dry-run: false
+[09:00:01] Entity types: all
+[09:00:01] Fetching entities since: 2026-03-16T09:00:01Z
 
-### 4.3 Transformation Layer (if needed)
+[09:00:01] Fetching decisions...
+[09:00:01]   Received 3 decision(s) from Sentra
+[09:00:01]   3 above threshold (≥0.75) → auto-import queue
+[09:00:01]   0 in review zone (0.50–0.74) → human review queue
+[09:00:01]   0 below threshold (<0.50) → ignored
+  Appended 3 new decisions to /path/to/graph/decisions.json
 
-If Sentra's native export format doesn't match the Veridian schema, add a `jq` transformation step. Example for Actors:
+[09:00:01] Fetching commitments...
+[09:00:01]   Received 3 commitment(s) from Sentra
+  Appended 3 new commitments to /path/to/graph/commitments.json
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Sync complete: 3 new decisions, 0 updated decisions, 3 new commitments, 0 updated commitments, 0 interactions observed (not imported)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ACTION REQUIRED:
+  3 new decision(s) and 3 new commitment(s) were appended.
+  Each has id: '__ASSIGN_ID__' — replace with the next sequential ID before using.
+```
+
+After the mock run, inspect the auto-imported entities in `graph/decisions.json`. They will have IDs set to `"__ASSIGN_ID__"` and fields marked `"__NEEDS_HUMAN_INPUT__"`. This is expected — they need manual completion before being usable.
+
+Validate the graph:
+```bash
+./scripts/validate.sh
+```
+
+Note: validate.sh will warn about `__ASSIGN_ID__` format — this is expected until IDs are assigned.
+
+Once you've verified the mock run works, revert the mock-added entities (or keep them in a test branch) before running the live sync:
 
 ```bash
-# Transform Sentra Actor format to Veridian Actor format
-curl -sf "$API_BASE/entities?type=actors" \
-  -H "Authorization: Bearer $SENTRA_API_KEY" | \
-jq '[.entities[] | {
-  id: ("actor-" + (.id | tostring | ltrimstr("0") | if length < 3 then ("000" + .) else . end | .[-3:])),
-  name: .full_name,
-  role: .title,
-  job_family: .department,
-  tools_used: (.connected_tools // []),
-  current_workflows: (.workflow_memberships // []),
-  reports_to: (.manager_id | if . then ("actor-" + .) else null end),
-  joined_date: .start_date
-}]' > "$GRAPH_DIR/actors.json"
+git diff graph/decisions.json   # review what was added
+git checkout graph/decisions.json  # revert if using live data next
+git checkout graph/commitments.json
 ```
 
-### 4.4 Set Up LaunchAgent for Auto-Sync (macOS)
+### 4.2 Run the First Live Sync
 
-To run the sync automatically every 4 hours on the machine that owns the graph repo:
+Ensure Sentra has been running for at least 7 days before the first live sync to give it enough data to produce useful extractions.
+
+```bash
+export SENTRA_API_KEY="sk-sentra-..."
+export SENTRA_WORKSPACE_ID="veridian-workspace-001"
+
+# Dry run first
+./sentra/sync.sh --dry-run
+
+# Live sync
+./sentra/sync.sh
+```
+
+After the first live sync, check `sentra/.sync-state/last-sync.json` for the sync summary.
+
+### 4.3 Review and Promote Auto-Imported Entities
+
+For each auto-imported entity (those with `"_review_status": "pending_human_review"`):
+
+1. Assign a sequential ID (check the last existing ID in the file and increment)
+2. Complete all `"__NEEDS_HUMAN_INPUT__"` fields
+3. Replace participant name strings with `actor-NNN` IDs
+4. Remove the `_sentra_*` metadata fields (or keep them — they don't affect the graph query)
+5. Run `./scripts/validate.sh`
+
+Assign this review task to Fatima Al-Rashid (commitments) and the relevant function head (decisions).
+
+---
+
+## Phase 5: Automate with LaunchAgent or Cron
+
+### 5.1 macOS LaunchAgent (recommended for local use)
 
 Create `~/Library/LaunchAgents/ai.vibrana.company-graph-sync.plist`:
 
@@ -302,12 +280,14 @@ Create `~/Library/LaunchAgents/ai.vibrana.company-graph-sync.plist`:
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/YOURUSER/Projects/company-graph-demo/scripts/sync-from-sentra.sh</string>
+    <string>/Users/YOURUSER/Projects/company-graph-demo/sentra/sync.sh</string>
   </array>
   <key>EnvironmentVariables</key>
   <dict>
     <key>SENTRA_API_KEY</key>
     <string>sk-sentra-YOUR-KEY-HERE</string>
+    <key>SENTRA_WORKSPACE_ID</key>
+    <string>veridian-workspace-001</string>
   </dict>
   <key>StartInterval</key>
   <integer>14400</integer>
@@ -316,28 +296,36 @@ Create `~/Library/LaunchAgents/ai.vibrana.company-graph-sync.plist`:
   <key>StandardErrorPath</key>
   <string>/tmp/company-graph-sync-error.log</string>
   <key>RunAtLoad</key>
-  <true/>
+  <false/>
 </dict>
 </plist>
 ```
 
-Load the agent:
+Load it:
 
 ```bash
 launchctl load ~/Library/LaunchAgents/ai.vibrana.company-graph-sync.plist
 launchctl start ai.vibrana.company-graph-sync
-```
 
-Check that it's running:
-
-```bash
+# Verify it's running
 launchctl list | grep company-graph
+
+# Monitor the log
 tail -f /tmp/company-graph-sync.log
 ```
 
-### 4.5 Alternative: GitHub Actions Scheduled Sync
+To unload: `launchctl unload ~/Library/LaunchAgents/ai.vibrana.company-graph-sync.plist`
 
-For teams using GitHub, a more robust option is a scheduled GitHub Actions workflow that pulls from Sentra and commits updated graph files:
+### 5.2 Linux Cron
+
+Add to crontab (`crontab -e`):
+
+```cron
+# Sync Veridian Company Graph from Sentra every 4 hours
+0 */4 * * * SENTRA_API_KEY=sk-sentra-... SENTRA_WORKSPACE_ID=veridian-workspace-001 /path/to/company-graph-demo/sentra/sync.sh >> /var/log/company-graph-sync.log 2>&1
+```
+
+### 5.3 GitHub Actions (best for team repos)
 
 Create `.github/workflows/sync-graph.yml`:
 
@@ -355,15 +343,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Sync from Sentra
         env:
           SENTRA_API_KEY: ${{ secrets.SENTRA_API_KEY }}
-        run: bash scripts/sync-from-sentra.sh
+          SENTRA_WORKSPACE_ID: ${{ secrets.SENTRA_WORKSPACE_ID }}
+        run: bash sentra/sync.sh
 
       - name: Validate graph
         run: bash scripts/validate.sh
 
-      - name: Commit changes
+      - name: Commit changes if any
         run: |
           git config user.name "Company Graph Bot"
           git config user.email "graph-bot@veridian.com"
@@ -372,73 +364,77 @@ jobs:
           git push
 ```
 
-Add `SENTRA_API_KEY` to the GitHub repository secrets.
+Add `SENTRA_API_KEY` and `SENTRA_WORKSPACE_ID` to GitHub repository secrets.
 
 ---
 
-## Phase 5: Ongoing Governance
+## What to Expect: Timeline from Sign-Up to Stable Data
 
-### Who Reviews What
+| Week | What's Happening |
+|---|---|
+| **Week 1** | Sentra indexes Slack history (up to 90 days backfill). Many false positives as the model calibrates. Don't review extractions yet — let it run. |
+| **Week 2** | Extraction quality stabilizes. Configure the commitment detection vocabulary and blocklist (Phase 3.1). Run the first review of surfaced entities. Expect ~30% genuine commitments. |
+| **Weeks 3–4** | First live sync. Review and promote the highest-confidence entities. Sentra starts recognizing Veridian-specific patterns (customer names, commitment language). |
+| **Month 2** | Weekly sync cadence established. Extraction quality meaningfully better — confidence scores rise as Sentra learns organizational vocabulary. |
+| **Month 3** | Steady state. Sentra surfaces 2–5 genuinely new commitments and 1–2 decisions per week. Human review becomes a 15-minute weekly task rather than an hour. |
 
-| Entity Type | Review Owner | Cadence | Decision |
+---
+
+## Ongoing Governance
+
+### Review Cadence
+
+| Entity Type | Who Reviews | Cadence | Where |
 |---|---|---|---|
-| New auto-extracted commitments | Fatima Al-Rashid (COO) | Weekly | Approve, dismiss, or escalate |
-| New decisions extracted from transcripts | Relevant function head | After each significant meeting | Approve and add rationale |
-| Actor updates (role changes, joiners) | Anya Volkov (People Ops) | As they happen | Approve |
-| New value objects surfaced by Sentra | Tom Adeyemi or relevant owner | Monthly | Classify and add business value |
-| Stale `still_valid=false` decisions | CEO/leadership team | Quarterly | Update or archive |
+| New auto-extracted commitments | Fatima Al-Rashid (COO) | Weekly, Monday | Sentra review queue + `graph/commitments.json` |
+| New auto-extracted decisions | Relevant function head | After significant meetings | Sentra review queue |
+| Actor changes (joiners, leavers, role changes) | Anya Volkov (People Ops) | As they happen | Rippling → Sentra → graph |
+| Stale `still_valid: false` decisions | CEO/leadership team | Quarterly | `graph/decisions.json` |
 
-### Quality Gates
+### The "Commitment Drift" Protocol
 
-Before any Sentra-extracted entity is promoted to `status: live` in the graph:
-1. A human reviewer must approve it
-2. The `confidence` score must be >0.7
-3. For commitments: the `evidence_source` must be a specific document, message, or meeting (not just "inferred")
-4. For decisions: the `rationale` field must be completed by a human (Sentra's extraction is a starting point, not the final record)
+When a new commitment is auto-imported with `_review_status: "pending_human_review"`:
+1. Fatima or her delegate reviews within 48 hours
+2. If genuine: assign ID, complete missing fields, update `_review_status` to `"approved"`
+3. If false positive: delete from the JSON file
+4. If needs more context: add a note and set `_review_status: "needs_context"` — flag for the commitment's owner to clarify
 
-### The "Broken Commitment" Protocol
-
-When Sentra detects that a commitment's due date has passed without evidence of fulfillment:
-1. Sentra flags it as `status: potentially_broken`
-2. The commitment owner receives a Slack notification (via Sentra's alerting)
-3. The owner has 48 hours to update the status or add a note
-4. If no action: the status escalates to `status: overdue` and the function head is notified
-5. If a commitment is marked `broken`: Fatima Al-Rashid is notified directly
-
-This protocol turns the Company Graph from a retrospective record into an active risk management system.
+This keeps the graph clean and the review burden manageable.
 
 ---
 
 ## Troubleshooting
 
-### Sentra is extracting too many false-positive commitments from Slack
+**Sentra is surfacing too many false-positive commitments from Slack**
+- Set commitment detection sensitivity to **Low** in Connector settings
+- Add more phrases to the blocklist (see Phase 3.1)
+- Exclude high-volume, low-signal channels like `#general` and `#announcements`
 
-- Reduce sensitivity to **Low** in **Connectors > Slack > Extraction Settings**
-- Add phrases to the blocklist: "can you", "would you", "might be able to", "I think"
-- Consider excluding `#general` and `#announcements` from commitment scanning
+**The sync script exits with "SENTRA_API_KEY is not set"**
+- Run: `export SENTRA_API_KEY="sk-sentra-..."` and `export SENTRA_WORKSPACE_ID="..."`
+- Or use `--mock` to test without credentials
 
-### Sentra is missing customer commitments from Salesforce
+**Auto-imported entities have `__ASSIGN_ID__` and `__NEEDS_HUMAN_INPUT__` fields**
+- This is expected — these are the mandatory human review steps
+- Replace `__ASSIGN_ID__` with the next sequential ID (`dec-013`, `com-015`, etc.)
+- Fill in `__NEEDS_HUMAN_INPUT__` fields with real data from context
+- Run `./scripts/validate.sh` to verify
 
-- Verify the Salesforce connector has read access to the `Note` and `Task` objects
-- Check that opportunity notes containing commitments use consistent language
-- Manually create high-priority commitments in Sentra and link to the Salesforce opportunity URL
+**`./scripts/validate.sh` fails after a sync**
+- Check that new entity IDs follow the `type-NNN` format (no `__ASSIGN_ID__` remaining)
+- Check that `made_by` and `made_to` fields reference valid `actor-NNN` IDs or valid strings
+- Check that `related_workflow` references a valid `wf-NNN` ID
 
-### The sync script fails with schema validation errors
-
-- Run `./scripts/validate.sh` to identify the specific field that's failing
-- Check if Sentra has added new fields or changed field names in a schema update
-- Review the Sentra changelog and update the transformation layer accordingly
-
-### A decision captured by Sentra is missing its dissenting views
-
-- This is expected — Sentra can extract the decision but not the disagreement unless it was stated explicitly in a transcript
-- Add dissenting views manually via `sentra entities update --id dec-NNN --field dissenting_views`
-- Consider adding a "decision documentation" ritual at the end of key meetings where the facilitator explicitly asks for dissenting views on the record
+**Sentra is missing customer commitments from sales calls**
+- These commitments live in Salesforce, not Slack — the Team plan Salesforce connector is not available
+- Manually seed high-priority customer commitments from Salesforce opportunity notes
+- For the Hartfield SSO commitment specifically, see `com-001` in `graph/commitments.json`
 
 ---
 
 ## Support
 
-- Sentra documentation: [docs.sentra.ai](https://docs.sentra.ai)
-- Vibrana integration support: Contact your Vibrana engagement lead
+- Sentra documentation: [docs.sentra.app](https://docs.sentra.app)
+- Sentra onboarding: Book a session at sentra.app when signing up (included with Team plan)
 - Graph schema questions: See `schema/entities.json` and `schema/relationships.json`
+- Vibrana integration support: Contact your Vibrana engagement lead

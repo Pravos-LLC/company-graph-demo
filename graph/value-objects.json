@@ -5,7 +5,7 @@
     "name": "Veridian Platform",
     "description": "The core SaaS product: a workflow automation and orchestration platform designed for mid-market finance teams. Deployed as a multi-tenant cloud application on AWS. Current version: 4.2. Customers manage, automate, and audit their financial workflows entirely within the platform.",
     "owner": "actor-004",
-    "business_value": "Primary revenue driver. All 47 active customers use it. ARR: £3.8M as of Q4 2025. NRR: 108% (declining from 118% two years ago).",
+    "business_value": "Primary revenue driver. All 89 active customers use it. ARR: £8.2M as of Q4 2025. NRR: 112% (up from 108% last year, recovering toward the 118% peak two years ago).",
     "connected_workflows": ["wf-003", "wf-004", "wf-009", "wf-011"],
     "health_status": "stable",
     "metadata": {
@@ -13,7 +13,7 @@
       "tech_stack": ["React", "Node.js", "PostgreSQL", "AWS", "Terraform"],
       "test_coverage_percent": 34,
       "incident_count_q4_2025": 3,
-      "active_customers": 47
+      "active_customers": 89
     }
   },
   {
@@ -22,7 +22,7 @@
     "name": "Hartfield Group",
     "description": "Enterprise customer. A UK-based asset management firm with £12B AUM. Uses Veridian for fund accounting workflow automation across 4 teams. Their Head of Finance (Richard Hartfield) is the primary executive sponsor. Technically sophisticated — their IT team has raised SSO as a security requirement repeatedly.",
     "owner": "actor-009",
-    "business_value": "ARR: £184,000/year. Highest single-account ARR in portfolio. At-risk due to SSO commitment breach. If churned, represents 4.8% ARR loss and a likely negative case study given Richard Hartfield's industry connections.",
+    "business_value": "ARR: £184,000/year. Highest single-account ARR in portfolio. At-risk due to SSO commitment breach. If churned, represents 2.2% ARR loss and a likely negative case study given Richard Hartfield's industry connections.",
     "connected_workflows": ["wf-006", "wf-013"],
     "health_status": "at_risk",
     "metadata": {
@@ -126,18 +126,19 @@
     "id": "vo-008",
     "type": "capital_asset",
     "name": "Series B Funding",
-    "description": "The £22M Series B raised in November 2023. Investors: Northwood Ventures (lead), Apex Capital (follow-on). Remaining runway approximately 26 months as of Q1 2026. The company is targeting Series C in H2 2026.",
+    "description": "The £38M Series B raised in November 2023. Investors: Northwood Ventures (lead), Apex Capital (follow-on). Remaining runway approximately 28 months as of Q1 2026. The company is targeting Series C in H2 2026 — needs a £12M+ ARR narrative.",
     "owner": "actor-001",
-    "business_value": "Primary financial resource constraining all major hiring and investment decisions. Burn rate: approximately £620K/month. Series C timeline is directly linked to ARR growth — current trajectory needs to show £5M+ ARR to support a credible Series C narrative.",
+    "business_value": "Primary financial resource constraining all major hiring and investment decisions. Burn rate: approximately £980K/month (higher than Series B baseline due to 150-person headcount). Series C timeline is directly linked to ARR growth — current £8.2M ARR trajectory needs to show £12M+ ARR to support a credible Series C narrative.",
     "connected_workflows": ["wf-001", "wf-012"],
     "health_status": "stable",
     "metadata": {
-      "amount_gbp": 22000000,
+      "amount_gbp": 38000000,
       "raised_date": "2023-11-01",
       "lead_investor": "Northwood Ventures",
-      "monthly_burn_gbp": 620000,
-      "runway_months": 26,
-      "series_c_target_date": "2026-Q4"
+      "monthly_burn_gbp": 980000,
+      "runway_months": 28,
+      "series_c_target_date": "2026-H2",
+      "series_c_arr_target_gbp": 12000000
     }
   },
   {

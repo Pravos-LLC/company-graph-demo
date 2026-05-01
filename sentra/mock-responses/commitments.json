@@ -1,0 +1,87 @@
+{
+  "entities": [
+    {
+      "id": "sentra-com-001",
+      "entity_type": "commitment",
+      "title": "Carlos Mendez to send Hartfield Group updated security questionnaire responses by April 22",
+      "made_by": {
+        "name": "Carlos Mendez",
+        "role": "Head of Solutions Engineering"
+      },
+      "made_to": {
+        "name": "Richard Hartfield",
+        "role": "CFO, Hartfield Group",
+        "organization": "Hartfield Group"
+      },
+      "made_at": "2026-04-11T16:03:00Z",
+      "due_date": "2026-04-22",
+      "source": {
+        "type": "email",
+        "title": "Re: Security Review — Renewal Preparation",
+        "id": "gmail-msg-18f4a92b3c0d"
+      },
+      "summary": "Carlos Mendez committed via email to send Hartfield Group an updated version of the Veridian security questionnaire responses, incorporating 2026 infrastructure changes, by April 22 2026.",
+      "confidence_score": 0.94,
+      "status_inference": "open",
+      "affects": ["Hartfield account renewal", "Security review"],
+      "raw_excerpt": "Carlos (email to Richard Hartfield's IT Director, April 11): 'I'll have the updated questionnaire responses to you by April 22 — we've made several infrastructure changes this quarter that I want to make sure are properly reflected. I'll also include our updated SOC 2 Type II report which just came back from auditors.'"
+    },
+    {
+      "id": "sentra-com-002",
+      "entity_type": "commitment",
+      "title": "Amara Diallo to share Finance Workflow Engine Q3 roadmap with CS team before QBR season",
+      "made_by": {
+        "name": "Amara Diallo",
+        "role": "Senior Product Manager — Platform"
+      },
+      "made_to": {
+        "name": "Priya Sharma",
+        "role": "Head of Customer Success"
+      },
+      "made_at": "2026-04-07T11:30:00Z",
+      "due_date": "2026-05-01",
+      "source": {
+        "type": "slack",
+        "title": "#product-cs-sync",
+        "id": "slack-thread-C02A9X-1743999000"
+      },
+      "summary": "Amara Diallo committed in Slack to share a CS-facing version of the Finance Workflow Engine Q3 roadmap with Priya Sharma's team before QBR season begins in early May.",
+      "confidence_score": 0.88,
+      "status_inference": "open",
+      "affects": ["wf-010", "CS QBR preparation", "Customer commitments visibility"],
+      "raw_excerpt": "Priya: 'Can we get something from Product that I can actually show accounts in QBRs? Even a rough directional roadmap would help.' Amara: 'Yes — I'll get you a CS-friendly version of what's in the Q3 FWE roadmap. Give me until May 1st, I want to make sure it's cleared with Tom first.' Priya: 'That works, thank you.'"
+    },
+    {
+      "id": "sentra-com-003",
+      "entity_type": "commitment",
+      "title": "Nadia Kovalchuk to include AI pilot ROI data in Series C financial model",
+      "made_by": {
+        "name": "Nadia Kovalchuk",
+        "role": "Head of Finance"
+      },
+      "made_to": {
+        "name": "Sarah Chen",
+        "role": "CEO"
+      },
+      "made_at": "2026-04-03T09:00:00Z",
+      "due_date": "2026-04-30",
+      "source": {
+        "type": "meeting",
+        "title": "Series C Prep — Finance & CEO sync",
+        "id": "gcal-evt-4c8b1d3e"
+      },
+      "summary": "Nadia Kovalchuk committed to including the invoice reconciliation AI pilot results (94% auto-match rate, estimated 6 hrs/month saved) as a dedicated slide and financial assumption in the Series C model, to support the 'AI-first operations' narrative.",
+      "confidence_score": 0.86,
+      "status_inference": "open",
+      "affects": ["com-007", "Series C preparation", "AI ROI narrative"],
+      "raw_excerpt": "Sarah: 'Investors are going to ask us what AI looks like in our own operations. Can we quantify it?' Nadia: 'Yes — we have real numbers from the invoice reconciliation pilot. I'll build it into the model as a separate section. 94% match rate, six hours saved per month, annualised that's £14K in staff time. I'll have it done before I send the full model.'"
+    }
+  ],
+  "meta": {
+    "count": 3,
+    "next_page": null,
+    "workspace_id": "veridian-workspace-001",
+    "since": "2026-03-01T00:00:00Z",
+    "generated_at": "2026-04-15T08:00:00Z"
+  }
+}

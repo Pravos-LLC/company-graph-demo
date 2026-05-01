@@ -1,0 +1,84 @@
+{
+  "entities": [
+    {
+      "id": "sentra-dec-001",
+      "entity_type": "decision",
+      "title": "Pause LinkedIn paid spend for Q2 2026 pending attribution fix",
+      "participants": [
+        { "name": "Sophie Laurent", "role": "Head of Marketing" },
+        { "name": "Sarah Chen", "role": "CEO" }
+      ],
+      "made_at": "2026-04-01T14:22:00Z",
+      "source": {
+        "type": "meeting",
+        "title": "Q2 Marketing Planning — April 1 2026",
+        "id": "gcal-evt-7b3f2c1a"
+      },
+      "summary": "Sophie Laurent and Sarah Chen agreed to pause LinkedIn paid campaigns for Q2 2026 and redirect the budget (~£18K/quarter) to content and SEO, pending resolution of the attribution tracking issue.",
+      "rationale": "Can't measure LinkedIn ROI without attribution. Sarah didn't want to keep spending on a channel they can't measure. Agreed to revisit in Q3 once HubSpot-Salesforce sync is fixed.",
+      "alternatives_considered": [
+        "Continue LinkedIn spend at current level",
+        "Reduce LinkedIn spend by 50% rather than pausing entirely"
+      ],
+      "confidence_score": 0.91,
+      "affects": ["Marketing budget", "wf-017", "Q2 pipeline targets"],
+      "raw_excerpt": "Sarah: 'I'm not comfortable spending £18K a quarter on LinkedIn if we literally cannot tell whether it's generating pipeline.' Sophie: 'Agreed. Let's pause it and put that money into the SEO push. We revisit when attribution is working — Ben says that's Q2.' Sarah: 'Fine. Lock it in.'"
+    },
+    {
+      "id": "sentra-dec-002",
+      "entity_type": "decision",
+      "title": "Defer Solaris Financial dedicated CSM hire until Q3 2026",
+      "participants": [
+        { "name": "Priya Sharma", "role": "Head of Customer Success" },
+        { "name": "Fatima Al-Rashid", "role": "COO" }
+      ],
+      "made_at": "2026-03-18T10:45:00Z",
+      "source": {
+        "type": "slack",
+        "title": "#cs-leadership thread",
+        "id": "slack-thread-C04B2X-1742296900"
+      },
+      "summary": "Priya Sharma and Fatima Al-Rashid agreed via Slack to defer the dedicated CSM hire for Solaris Financial from Q1 to Q3 2026 due to budget constraints in the Q2 headcount plan.",
+      "rationale": "Fatima flagged that two other open headcount requests (data analyst, sales engineer) were higher priority for Series C story. Chloe Beaumont will continue covering Solaris temporarily. Priya agreed reluctantly.",
+      "alternatives_considered": [
+        "Hire dedicated CSM in Q2 2026 as originally planned",
+        "Promote an existing CSM to named account role for Solaris"
+      ],
+      "confidence_score": 0.82,
+      "affects": ["com-005", "Solaris Financial account health", "Priya Sharma capacity"],
+      "raw_excerpt": "Priya: 'We're now 75 days past Solaris renewal with no named CSM. This is a risk.' Fatima: 'I know. But the Series C headcount model doesn't have room for another CSM until Q3. Chloe's doing a good job covering it — let's keep that for now and revisit in June.' Priya: 'OK but I want this logged somewhere so it doesn't get forgotten again.'"
+    },
+    {
+      "id": "sentra-dec-003",
+      "entity_type": "decision",
+      "title": "Move Q2 engineering all-hands to async format",
+      "participants": [
+        { "name": "Oliver Mwangi", "role": "VP Engineering" },
+        { "name": "Yuki Tanaka", "role": "Head of Engineering" },
+        { "name": "Marcus Webb", "role": "CTO" }
+      ],
+      "made_at": "2026-04-08T09:15:00Z",
+      "source": {
+        "type": "meeting",
+        "title": "Engineering Leadership Sync — April 8",
+        "id": "gcal-evt-9e4d7a2b"
+      },
+      "summary": "Oliver Mwangi proposed and Marcus Webb approved moving the Q2 engineering all-hands from a 2-hour synchronous call to an async Loom video + Notion Q&A format, given the timezone spread across London, Tokyo, Nairobi, Bangalore, and Accra.",
+      "rationale": "The synchronous format requires engineers in Tokyo and Accra to join at 6am or 11pm respectively. Oliver argued async respects the team and the recording is more useful anyway. Marcus agreed on condition that Oliver hosts a 30-min live Q&A in two timezone windows.",
+      "alternatives_considered": [
+        "Keep synchronous all-hands at current time",
+        "Run two separate synchronous sessions for different timezone groups"
+      ],
+      "confidence_score": 0.77,
+      "affects": ["Engineering team communication", "wf-009"],
+      "raw_excerpt": "Oliver: 'The Tokyo and Accra teams are telling me they dread all-hands because of the time. Let's go async with Loom.' Marcus: 'I'm fine with that as long as there's a live Q&A window so people can actually ask questions. Two windows — EMEA and APAC.' Oliver: 'Done.'"
+    }
+  ],
+  "meta": {
+    "count": 3,
+    "next_page": null,
+    "workspace_id": "veridian-workspace-001",
+    "since": "2026-03-01T00:00:00Z",
+    "generated_at": "2026-04-15T08:00:00Z"
+  }
+}
